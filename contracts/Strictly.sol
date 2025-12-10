@@ -2,10 +2,10 @@
 pragma solidity ^0.8.30;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
-contract Strictly Ownable, ReentrancyGuard, Pausable {
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+
+contract Strictly is Ownable, ReentrancyGuard, Pausable {
     uint64 public constant BILLING_PERIOD = 30 days;
-    address public owner;
     uint64 public immutable epochStart;
     uint256 public monthlyFee;
 
@@ -50,14 +50,8 @@ contract Strictly Ownable, ReentrancyGuard, Pausable {
         uint256 refundedToListener
     );
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Strictly: not owner");
-        _;
-    }
-
-    constructor(uint256 _monthlyFee) {
+    constructor(uint256 _monthlyFee) Ownable(msg.sender) {
         require(_monthlyFee > 0, "Strictly: monthly fee required");
-        owner = msg.sender;
         monthlyFee = _monthlyFee;
         epochStart = uint64(block.timestamp);
     }
@@ -169,7 +163,7 @@ contract Strictly Ownable, ReentrancyGuard, Pausable {
         require(period < currentPeriod(), "Strictly: period still active");
         require(hasPaidForPeriod[listener][period], "Strictly: period unpaid");
         require(!periodSettled[listener][period], "Strictly: already settled");
-        require(msg.sender == listener || msg.sender == owner, "Strictly: not authorised");
+        require(msg.sender == listener || msg.sender == owner(), "Strictly: not authorised");
 
         periodSettled[listener][period] = true;
 
