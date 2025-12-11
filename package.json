@@ -21,6 +21,12 @@
   },
   "homepage": "https://github.com/ellarhur/strictlydapp#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^5.4.0"
-  }
+    "@openzeppelin/contracts": "^5.4.0",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.16.0"
+  },
+  "devDependencies": {
+    "hardhat": "^3.1.0"
+  },
+  "type": "module"
 }
