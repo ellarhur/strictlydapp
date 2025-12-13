@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "dev": "cd frontend && npm run dev",
     "deploy:base": "./scripts/deploy-base.sh",
     "compile": "hardhat compile",
     "test": "hardhat test"
