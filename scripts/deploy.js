@@ -1,15 +1,16 @@
-import hre from "hardhat";
-import { parseEther } from "ethers";
+import { network } from "hardhat";
+
+const { ethers } = await network.connect();
 
 async function main() {
   console.log("Deploying Strictly contract to Base Sepolia...");
 
   // Sätt månadsavgiften (0.01 ETH som exempel)
-  const monthlyFee = parseEther("0.01");
+  const monthlyFee = ethers.parseEther("0.01");
   
-  console.log(`Monthly fee: ${monthlyFee.toString()} wei (${hre.ethers.formatEther(monthlyFee)} ETH)`);
+  console.log(`Monthly fee: ${monthlyFee.toString()} wei (${ethers.formatEther(monthlyFee)} ETH)`);
 
-  const Strictly = await hre.ethers.getContractFactory("Strictly");
+  const Strictly = await ethers.getContractFactory("Strictly");
   const strictly = await Strictly.deploy(monthlyFee);
 
   await strictly.waitForDeployment();
@@ -20,8 +21,8 @@ async function main() {
   console.log(`📝 Save this address for your frontend!`);
   
   // Visa nätverksinformation
-  const network = await hre.ethers.provider.getNetwork();
-  console.log(`Network: ${network.name} (chainId: ${network.chainId})`);
+  const networkInfo = await ethers.provider.getNetwork();
+  console.log(`Network: ${networkInfo.name} (chainId: ${networkInfo.chainId})`);
   
   // Vänta lite innan verifiering
   console.log("\nWaiting for block confirmations...");
