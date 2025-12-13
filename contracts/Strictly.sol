@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
-contract Strictly {
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+contract Strictly is ReentrancyGuard {
     uint64 public constant BILLING_PERIOD = 30 days;
     uint64 public immutable epochStart;
     uint256 public monthlyFee;
@@ -154,7 +155,7 @@ contract Strictly {
         emit TrackPlayed(trackId, msg.sender, period, block.timestamp);
     }
 
-    function settleListenerPeriod(address listener, uint64 period) external {
+    function settleListenerPeriod(address listener, uint64 period) external nonReentrant {
         require(listener != address(0), "Strictly: listener required");
         require(period < currentPeriod(), "Strictly: period still active");
         require(hasPaidForPeriod[listener][period], "Strictly: period unpaid");
