@@ -5,6 +5,18 @@
   text-align: center;
 }
 
+/* Gradient bakgrund för Home och Login sidor */
+.landing-page-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1D1C1C;
+  background: linear-gradient(189deg, rgba(29, 28, 28, 1) 26%, rgba(122, 46, 46, 1) 42%, rgba(231, 86, 42, 1) 61%, rgba(63, 105, 99, 1) 85%);
+  z-index: -1;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
