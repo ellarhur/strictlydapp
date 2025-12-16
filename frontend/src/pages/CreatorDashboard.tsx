@@ -27,8 +27,10 @@ const CreatorDashboard = () => {
 
   return (
     <>
+      <div className="logo"><a href="/ListenerDashboard">Strictly</a></div>
       <Navbar />
-      <div className="creator-dashboard">
+      
+      <div className="main-content">
         <h1>Creator Dashboard</h1>
         <p>Welcome to your artist space</p>
 

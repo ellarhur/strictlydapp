@@ -1,13 +1,4 @@
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 .landing-page-gradient {
   position: fixed;
   top: 0;
@@ -73,9 +64,11 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  background-color: #1d1c1c;
+  background: #1D1C1C;
+  background: linear-gradient(189deg,rgba(29, 28, 28, 1) 6%, rgba(212, 194, 154, 1) 94%);
   font-family: "Lexend Deca", sans-serif;
   font-weight: 400;
+  height:100vh;
 }
 
 h1 {
@@ -105,27 +98,102 @@ button:focus-visible {
 }
 
 nav {
+  position: fixed;
+  left: 30px;
+  top: 120px;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0;
+  background-color: transparent;
+  color: #3f6963;
+  list-style: none !important;
+  text-decoration: none;
+  line-height: 1.5;
+  font-size: 1.1rem;
+  z-index: 100;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+nav li {
+  list-style: none;
+}
+
+.logo {
+  position: fixed;
+  left: 30px;
+  top: 50px;
+  font-size: 2em;
+  font-weight: 700;
+  z-index: 100;
+}
+
+.logo a {
+  color: #e7562a;
+  text-decoration: none;
+}
+
+.logo a:visited {
+  color: #e7562a;
+}
+
+.dashboard-layout {
+  margin-left: 280px;
+  margin-top: 120px;
   display: flex;
   flex-direction: row;
-  align-items:left;
-  justify-content:left;
+  gap: 30px;
   padding: 20px;
-  background-color: #1d1c1c;
-  margin-left: 0px;
 }
+
+.main-content {
+  flex: 1;
+  max-width: 700px;
+}
+
+.main-content h1 {
+  margin-bottom: 40px;
+  font-size: 2.5em;
+}
+
+
+nav a:hover {
+  color: #e7562a;
+}
+
+a {
+  color: #3f6963;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #3f6963;
+}
+
 
 .recommended-tracks {
   display: flex;
   flex-direction: column;
+  padding: 50px;
+  border-radius:12px;
   font-family: "Lexend Deca", sans-serif;
   font-size: 1.2em;
   font-weight: 400;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 20px;
   color: #ebdfdf;
   text-align: left;
-  margin-left: 0px;
+  background-color: #1D1C1C;
 }
 
 .trackcard {
@@ -226,10 +294,6 @@ nav {
 }
 
 /* Creator Dashboard Styles */
-.creator-dashboard {
-  padding: 20px;
-}
-
 .upload-button {
   margin: 20px 0;
   padding: 12px 24px;
@@ -263,6 +327,12 @@ nav {
   font-size: 0.9em;
   color: #888;
   font-style: italic;
+}
+
+.containing-things2 {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
 }
 
 /* Mode Toggle Button with Transition */
