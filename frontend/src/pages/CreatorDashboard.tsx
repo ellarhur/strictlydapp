@@ -30,7 +30,9 @@ const CreatorDashboard = () => {
       <div className="logo"><a href="/ListenerDashboard">Strictly</a></div>
       <Navbar />
       
-      <div className="main-content">
+            
+      <div className="dashboard-layout">
+                <div className="main-content">
         <h1>Creator Dashboard</h1>
         <p>Welcome to your artist space</p>
 
@@ -47,16 +49,17 @@ const CreatorDashboard = () => {
 
         <div className="my-tracks">
           <h2>My Tracks ({myTracks.length})</h2>
-          <div className="tracks-grid">
-            {myTracks.map(track => (
-              <div key={track.id} className="trackcard">
-                <img src={track.imageUrl || "/assets/track-1.jpg"} alt={track.title} />
+          {myTracks.map((track, index) => (
+            <div key={track.id} className="trackcard">
+              <span className="track-number">{index + 1}</span>
+              <img src={track.imageUrl || "/assets/track-1.jpg"} alt={track.title} />
+              <div className="track-info">
                 <h3>{track.title}</h3>
                 <p>{track.artist}</p>
-                <p className="genre">{track.genre}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
         </div>
       </div>
     </>
