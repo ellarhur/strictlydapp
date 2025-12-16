@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import './App.css'
+import './index.css'
 import Home from './pages/Home'
 import LogIn from './pages/LogIn'
 import ListenerDashboard from './pages/ListenerDashboard'

@@ -1,10 +1,9 @@
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useTracks } from '../contexts/TracksContext';
+import ModeButton from '../components/ModeButton';
 import '../index.css';
 
 const ListenerDashboard = () => {
-    const navigate = useNavigate();
     const { tracks, currentTrack, setCurrentTrack } = useTracks();
 
     const handleTrackClick = (trackId: number) => {
@@ -16,9 +15,8 @@ const ListenerDashboard = () => {
 
     return (
         <>
-        <Navbar />
-            <h1>Listener Dashboard</h1>
-            <p>Welcome to Strictly. </p>
+            <Navbar />
+            <h1>Listen to your favourite tracks</h1>
             <div className="recommended-tracks">
                 <h2>Today's top hits</h2>
                 {tracks.slice(0, 3).map(track => (
@@ -33,24 +31,27 @@ const ListenerDashboard = () => {
                     </div>
                 ))}
             </div>
-            <div className="listener-artist-mode">
-                <button className="listener-mode">Listener</button>
-                <button className="artist-mode" onClick={() => navigate('/CreatorDashboard')}>Artist</button>
+            
+            <ModeButton />
+            
+            <div className="streaming-window">
+                <h2>Now Playing...</h2>
+                {currentTrack ? (
+                    <>
+                        <img src={currentTrack.imageUrl || "/assets/track-1.jpg"} alt={currentTrack.title} />
+                        <div className="player-controls">
+                            <button className="from-beginning">⏮</button>
+                            <button className="pause">⏸</button>
+                            <button className="skip">⏭</button>
+                        </div>
+                        <p className="track-name">{currentTrack.title}</p>
+                        <p className="artist-name">{currentTrack.artist}</p>
+                        <p className="genre-tag">{currentTrack.genre}</p>
+                    </>
+                ) : (
+                    <p style={{ color: '#aaa' }}>Välj en låt för att börja spela...</p>
+                )}
             </div>
-            {currentTrack && (
-                <div className="streaming-window">
-                    <h2>Now Playing...</h2>
-                    <img src={currentTrack.imageUrl || "/assets/track-1.jpg"} alt={currentTrack.title} />
-                    <div className="player-controls">
-                        <button className="from-beginning">⏮</button>
-                        <button className="pause">⏸</button>
-                        <button className="skip">⏭</button>
-                    </div>
-                    <p className="track-name">{currentTrack.title}</p>
-                    <p className="artist-name">{currentTrack.artist}</p>
-                    <p className="genre-tag">{currentTrack.genre}</p>
-                </div>
-            )}
         </>
     )
 }

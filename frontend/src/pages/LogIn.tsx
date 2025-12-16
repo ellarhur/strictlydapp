@@ -19,7 +19,6 @@ const LogIn = () => {
                 return;
             }
 
-            // Detta öppnar MetaMask/Coinbase popup där användaren väljer konto
             const accounts = await window.ethereum.request({ 
                 method: 'eth_requestAccounts' 
             });

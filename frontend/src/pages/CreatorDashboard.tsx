@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import UploadForm from '../components/UploadForm';
+import ModeButton from '../components/ModeButton';
 import { useTracks } from '../contexts/TracksContext';
 import { TrackFormData, Track } from '../types/track';
 import '../index.css';
@@ -13,7 +14,7 @@ const CreatorDashboard = () => {
     const newTrack: Track = {
       id: tracks.length + 1,
       ...trackData,
-      uploader: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1", // Detta ska komma från wallet
+      uploader: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1",
       exists: true
     };
     
@@ -30,6 +31,8 @@ const CreatorDashboard = () => {
       <div className="creator-dashboard">
         <h1>Creator Dashboard</h1>
         <p>Welcome to your artist space</p>
+
+        <ModeButton />
 
         <button 
           className="upload-button"

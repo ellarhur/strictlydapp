@@ -1,12 +1,3 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: #ebdfdf;
-  /* Ingen global bakgrund - varje sida har sin egen */
-}
 
 a {
   font-weight: 500;
@@ -17,18 +8,81 @@ a:hover {
   color: #535bf2;
 }
 
+.landing-page-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1D1C1C;
+  background: linear-gradient(189deg, rgba(29, 28, 28, 1) 26%, rgba(122, 46, 46, 1) 42%, rgba(231, 86, 42, 1) 61%, rgba(63, 105, 99, 1) 85%);
+  z-index: -1;
+}
+
+.introduction {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.introduction h1 {
+  font-size: 4em;
+  margin-bottom: 20px;
+  color: #ebdfdf;
+}
+
+.introduction p {
+  font-size: 1.5em;
+  margin-bottom: 30px;
+  color: #ebdfdf;
+}
+
+.getstarted-button {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.getstarted-button:hover {
+  background-color: #535bf2;
+  transform: scale(1.05);
+  border-color: transparent;
+}
+
+.landingpage-design {
+  text-align: center;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.landingpage-design img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+
 body {
   margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
   background-color: #1d1c1c;
+  font-family: "Lexend Deca", sans-serif;
+  font-weight: 400;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  font-family: "Lexend Deca", sans-serif;
+  font-weight: 400;
 }
 
 button {
@@ -56,15 +110,22 @@ nav {
   align-items:left;
   justify-content:left;
   padding: 20px;
-  background-color: ;
+  background-color: #1d1c1c;
+  margin-left: 0px;
 }
 
 .recommended-tracks {
   display: flex;
   flex-direction: column;
-  align-items:left;
-  justify-content:left;
+  font-family: "Lexend Deca", sans-serif;
+  font-size: 1.2em;
+  font-weight: 400;
+  align-items: flex-start;
+  justify-content: flex-start;
   padding: 20px;
+  color: #ebdfdf;
+  text-align: left;
+  margin-left: 0px;
 }
 
 .trackcard {
@@ -204,7 +265,62 @@ nav {
   font-style: italic;
 }
 
-/* Listener/Artist Mode Toggle */
+/* Mode Toggle Button with Transition */
+.mode-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin: 30px 20px;
+}
+
+.mode-toggle {
+  position: relative;
+  display: inline-flex;
+  background-color: #2a2a2a;
+  border-radius: 50px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.mode-toggle-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.mode-toggle-slider.artist {
+  transform: translateX(calc(100% + 4px));
+}
+
+.mode-button {
+  position: relative;
+  z-index: 1;
+  padding: 12px 32px;
+  background: transparent;
+  color: #aaa;
+  border: none;
+  border-radius: 50px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  min-width: 120px;
+}
+
+.mode-button.active {
+  color: #fff;
+}
+
+.mode-button:hover {
+  border-color: transparent;
+}
+
+/* Legacy styles för compatibility */
 .listener-artist-mode {
   display: flex;
   gap: 10px;
@@ -228,10 +344,8 @@ nav {
   padding: 30px;
   border-radius: 12px;
   margin: 20px;
-  text-align: center;
+  text-align: left;
   max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .streaming-window img {
@@ -244,7 +358,7 @@ nav {
 
 .player-controls {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 20px;
   margin: 20px 0;
 }
