@@ -24,8 +24,8 @@ const ListenerDashboard = () => {
             <div className="dashboard-layout">
                 <div className="main-content">
                     <div className="recommended-tracks">
-                        <h2>Today's top hits</h2>
-                        {tracks.slice(0, 3).map(track => (
+                        <h2>Latest uploaded tracks</h2>
+                        {tracks.slice().reverse().slice(0, 3).map(track => (
                             <div 
                                 key={track.id} 
                                 className="trackcard clickable"
