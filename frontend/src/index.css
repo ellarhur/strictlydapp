@@ -373,7 +373,7 @@ a:visited {
 /* Upload Form Styles */
 .upload-form {
   background-color: #2a2a2a;
-  padding: 30px;
+  padding: 10px;
   border-radius: 12px;
   margin: 20px 0;
   max-width: 100%;
@@ -387,7 +387,7 @@ a:visited {
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .form-group label {
@@ -400,6 +400,7 @@ a:visited {
 .form-group input,
 .form-group select {
   width: 100%;
+  width: 500px;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #444;

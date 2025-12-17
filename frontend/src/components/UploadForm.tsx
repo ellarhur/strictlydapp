@@ -127,18 +127,6 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="audioUrl">Audio File URL</label>
-        <input
-          type="text"
-          id="audioUrl"
-          name="audioUrl"
-          value={formData.audioUrl}
-          onChange={handleChange}
-          placeholder="https://..."
-        />
-      </div>
-
       <button type="submit" className="submit-button">
         Upload Track
       </button>
