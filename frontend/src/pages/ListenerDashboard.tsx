@@ -55,7 +55,7 @@ const ListenerDashboard = () => {
                         <p className="genre-tag">{currentTrack.genre}</p>
                     </>
                 ) : (
-                    <p className="no-track-message">Välj en låt för att börja spela...</p>
+                    <p className="no-track-message">Pick a song to listen to!</p>
                 )}
                     </div>
                 </div>
