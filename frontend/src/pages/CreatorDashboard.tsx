@@ -7,7 +7,7 @@ import { TrackFormData, Track } from '../types/track';
 import '../index.css';
 
 const CreatorDashboard = () => {
-  const { tracks, addTrack } = useTracks();
+  const { tracks, addTrack, currentTrack } = useTracks();
   const [showUploadForm, setShowUploadForm] = useState(false);
 
   const handleUpload = (trackData: TrackFormData) => {
@@ -29,37 +29,40 @@ const CreatorDashboard = () => {
     <>
       <div className="logo"><a href="/ListenerDashboard">Strictly</a></div>
       <Navbar />
-      
+      <ModeButton />
             
+      <h1 className="dashboard-title">Upload your tracks</h1>
+      
       <div className="dashboard-layout">
-                <div className="main-content">
-        <h1>Creator Dashboard</h1>
-        <p>Welcome to your artist space</p>
+        <div className="main-content">
+        
 
-        <ModeButton />
-
-        <button 
-          className="upload-button"
-          onClick={() => setShowUploadForm(!showUploadForm)}
-        >
-          {showUploadForm ? 'Cancel' : 'Upload New Track'}
-        </button>
-
-        {showUploadForm && <UploadForm onUpload={handleUpload} />}
-
-        <div className="my-tracks">
-          <h2>My Tracks ({myTracks.length})</h2>
-          {myTracks.map((track, index) => (
-            <div key={track.id} className="trackcard">
-              <span className="track-number">{index + 1}</span>
-              <img src={track.imageUrl || "/assets/track-1.jpg"} alt={track.title} />
-              <div className="track-info">
-                <h3>{track.title}</h3>
-                <p>{track.artist}</p>
+          <div className="recommended-tracks">
+            <h2>My Tracks ({myTracks.length})</h2>
+            {myTracks.map((track, index) => (
+              <div key={track.id} className="trackcard">
+                <span className="track-number">{index + 1}</span>
+                <img src={track.imageUrl || "/assets/track-1.jpg"} alt={track.title} />
+                <div className="track-info">
+                  <h3>{track.title}</h3>
+                  <p>{track.artist}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        
+        <div className="sidebar-player">
+          <div className="streaming-window">
+          <button 
+            className="upload-button"
+            onClick={() => setShowUploadForm(!showUploadForm)}
+          >
+            {showUploadForm ? 'Cancel' : 'Upload New Track'}
+          </button>
+
+          {showUploadForm && <UploadForm onUpload={handleUpload} />}
+          </div>
         </div>
       </div>
     </>

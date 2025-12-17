@@ -19,10 +19,10 @@ const ListenerDashboard = () => {
             <Navbar />
             <ModeButton />
             
+            <h1 className="dashboard-title">Listen to your favourite tracks</h1>
+            
             <div className="dashboard-layout">
                 <div className="main-content">
-                    <h1>Listen to your favourite tracks</h1>
-                    
                     <div className="recommended-tracks">
                         <h2>Today's top hits</h2>
                         {tracks.slice(0, 3).map(track => (
@@ -39,7 +39,7 @@ const ListenerDashboard = () => {
                     </div>
                 </div>
                 
-                <div className="containing-things2">
+                <div className="sidebar-player">
                     <div className="streaming-window">
                 <h2>Now Playing...</h2>
                 {currentTrack ? (
@@ -55,7 +55,7 @@ const ListenerDashboard = () => {
                         <p className="genre-tag">{currentTrack.genre}</p>
                     </>
                 ) : (
-                    <p style={{ color: '#aaa' }}>Välj en låt för att börja spela...</p>
+                    <p className="no-track-message">Välj en låt för att börja spela...</p>
                 )}
                     </div>
                 </div>

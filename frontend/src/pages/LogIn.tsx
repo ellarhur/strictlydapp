@@ -26,12 +26,10 @@ const LogIn = () => {
             if (accounts.length > 0) {
                 setAvailableAccounts(accounts);
                 
-                // Om användaren har flera konton, visa val
                 if (accounts.length > 1) {
                     setShowAccountSelector(true);
                     setMessage(`Hittade ${accounts.length} konton. Välj vilket du vill använda:`);
                 } else {
-                    // Bara ett konto, använd det direkt
                     setWalletAddress(accounts[0]);
                     setShowAccountSelector(false);
                     
@@ -107,16 +105,16 @@ const LogIn = () => {
                 <h1>Strictly</h1>
                 <p>Support your favourite artists directly.</p>
                 
-                <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+                <div className="login-form-container">
                     <h2>{isRegisterMode ? 'Registrera' : 'Logga in'}</h2>
                     
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <form onSubmit={handleSubmit} className="login-form">
                         <input
                             type="text"
                             placeholder="Användarnamn"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                            className="login-input"
                         />
                         
                         <input
@@ -124,7 +122,7 @@ const LogIn = () => {
                             placeholder="Lösenord"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                            className="login-input"
                         />
                         
                         {isRegisterMode && (
@@ -132,36 +130,20 @@ const LogIn = () => {
                                 <button 
                                     type="button"
                                     onClick={handleConnectWallet}
-                                    style={{ padding: '10px', borderRadius: '5px', cursor: 'pointer' }}
+                                    className="wallet-button"
                                 >
                                     {walletAddress ? `Ansluten: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'Anslut Wallet'}
                                 </button>
                                 
                                 {showAccountSelector && availableAccounts.length > 0 && (
-                                    <div style={{ 
-                                        marginTop: '10px', 
-                                        padding: '10px', 
-                                        border: '1px solid #ccc', 
-                                        borderRadius: '5px',
-                                        backgroundColor: '#f9f9f9'
-                                    }}>
-                                        <p style={{ margin: '0 0 10px 0', fontWeight: 'bold' }}>Välj konto:</p>
+                                    <div className="account-selector">
+                                        <p className="account-selector-title">Välj konto:</p>
                                         {availableAccounts.map((account, index) => (
                                             <button
                                                 key={account}
                                                 type="button"
                                                 onClick={() => selectAccount(account)}
-                                                style={{
-                                                    display: 'block',
-                                                    width: '100%',
-                                                    padding: '8px',
-                                                    marginBottom: '5px',
-                                                    cursor: 'pointer',
-                                                    borderRadius: '3px',
-                                                    border: '1px solid #ddd',
-                                                    backgroundColor: 'white',
-                                                    textAlign: 'left'
-                                                }}
+                                                className="account-button"
                                             >
                                                 Konto {index + 1}: {account.slice(0, 10)}...{account.slice(-8)}
                                             </button>
@@ -173,14 +155,13 @@ const LogIn = () => {
                         
                         <button 
                             type="submit"
-                            className="getstarted-button"
-                            style={{ padding: '10px', borderRadius: '5px', cursor: 'pointer' }}
+                            className="getstarted-button login-submit-button"
                         >
                             {isRegisterMode ? 'Registrera' : 'Logga in'}
                         </button>
                     </form>
                     
-                    <p style={{ marginTop: '15px' }}>
+                    <p className="toggle-text">
                         {isRegisterMode ? 'Har du redan ett konto?' : 'Har du inget konto?'}
                         {' '}
                         <button 
@@ -188,24 +169,18 @@ const LogIn = () => {
                                 setIsRegisterMode(!isRegisterMode);
                                 setMessage('');
                             }}
-                            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+                            className="toggle-link"
                         >
                             {isRegisterMode ? 'Logga in här' : 'Registrera dig här'}
                         </button>
                     </p>
                     
                     {message && (
-                        <p style={{ 
-                            marginTop: '15px', 
-                            color: message.includes('lyckades') ? 'green' : 'red' 
-                        }}>
+                        <p className={`message ${message.includes('lyckades') ? 'success' : 'error'}`}>
                             {message}
                         </p>
                     )}
                 </div>
-            </div>
-            <div className="landingpage-design">
-                <img src="/assets/landingpage-design.png" alt="Strictly landing page design" /> 
             </div>
         </>
     )
