@@ -91,7 +91,7 @@
 
 .wallet-button:hover {
   background-color: #3a3a3a;
-  border-color: #646cff;
+  border-color: #7a2e2e;
 }
 
 .account-selector {
@@ -170,7 +170,7 @@ body {
   justify-content: center;
   align-items: center;
   background: #1D1C1C;
-  background: linear-gradient(189deg,rgba(29, 28, 28, 1) 6%, rgba(212, 194, 154, 1) 94%);
+  background: linear-gradient(175deg,rgba(29, 28, 28, 1) 53%, rgba(88, 81, 69, 1) 85%, rgba(231, 86, 42, 1) 100%);
   font-family: "Lexend Deca", sans-serif;
   font-weight: 400;
   min-height: 100vh;
@@ -196,7 +196,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #7a2e2e;
 }
 button:focus,
 button:focus-visible {
@@ -288,10 +288,10 @@ nav li {
 
 .main-content {
   flex: 1;
-  width: 600px;
-  min-width: 600px;
-  max-width: 600px;
-  height: 100%;
+  width: 900px;
+  min-width: 900px;
+  max-width: 900px;
+  height: 900px;
   overflow-y: auto;
 }
 
@@ -325,7 +325,8 @@ a:visited {
   background-color: #1D1C1C;
   width: 100%;
   box-sizing: border-box;
-  min-height: 500px;
+  height: 100%;
+
 }
 
 .trackcard {
@@ -371,7 +372,9 @@ a:visited {
   padding: 30px;
   border-radius: 12px;
   margin: 20px 0;
-  max-width: 600px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .upload-form h2 {
@@ -405,13 +408,13 @@ a:visited {
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #7a2e2e;
 }
 
 .submit-button {
   width: 100%;
   padding: 12px;
-  background-color: #646cff;
+  background-color: #7a2e2e;
   color: white;
   border: none;
   border-radius: 8px;
@@ -503,11 +506,11 @@ a:visited {
 
 .sidebar-player {
   width: 400px;
-  min-width: 400px;
-  max-width: 400px;
-  height: 600px;
-  min-height: 600px;
-  max-height: 600px;
+  min-width: 600px;
+  max-width: auto;
+  height: 900px;
+  min-height: auto;
+  max-height: auto;
 }
 
 /* Mode Toggle Button with Transition */
@@ -661,7 +664,7 @@ a:visited {
 .upload-button {
   margin: 20px 0;
   padding: 12px 24px;
-  background-color: #646cff;
+  background-color: #7a2e2e;
   color: white;
   font-weight: 600;
 }
@@ -689,7 +692,7 @@ a:visited {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #646cff;
+  background-color: #7a2e2e;
   color: white;
   border: none;
 }
@@ -714,7 +717,7 @@ a:visited {
 .genre-tag {
   display: inline-block;
   padding: 5px 15px;
-  background-color: #646cff;
+  background-color: #7a2e2e;
   border-radius: 20px;
   font-size: 0.9em;
   margin-top: 10px;

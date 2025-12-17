@@ -7,7 +7,7 @@ import { TrackFormData, Track } from '../types/track';
 import '../index.css';
 
 const CreatorDashboard = () => {
-  const { tracks, addTrack, currentTrack } = useTracks();
+  const { tracks, addTrack } = useTracks();
   const [showUploadForm, setShowUploadForm] = useState(false);
 
   const handleUpload = (trackData: TrackFormData) => {
