@@ -38,7 +38,7 @@ const LogIn = () => {
                     if (provider.isMetaMask) walletName = 'MetaMask';
                     else if (provider.isCoinbaseWallet) walletName = 'Coinbase Wallet';
                     
-                    setMessage(`${walletName} ansluten!`);
+                    setMessage(`${walletName} connected!`);
                 }
             }
         } catch (error: any) {
@@ -61,20 +61,20 @@ const LogIn = () => {
         if (provider?.isMetaMask) walletName = 'MetaMask';
         else if (provider?.isCoinbaseWallet) walletName = 'Coinbase Wallet';
         
-        setMessage(`${walletName} ansluten!`);
+        setMessage(`${walletName} connected!`);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!username || !password) {
-            setMessage('Fyll i alla fält');
+            setMessage('Fill in all fields');
             return;
         }
 
         if (isRegisterMode) {
             if (!walletAddress) {
-                setMessage('Anslut din wallet först');
+                setMessage('Connect your wallet first');
                 return;
             }
 
@@ -106,12 +106,12 @@ const LogIn = () => {
                 <p>Support your favourite artists directly.</p>
                 
                 <div className="login-form-container">
-                    <h2>{isRegisterMode ? 'Registrera' : 'Logga in'}</h2>
+                    <h2>{isRegisterMode ? 'Register' : 'Log in'}</h2>
                     
                     <form onSubmit={handleSubmit} className="login-form">
                         <input
                             type="text"
-                            placeholder="Användarnamn"
+                            placeholder="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="login-input"
@@ -119,7 +119,7 @@ const LogIn = () => {
                         
                         <input
                             type="password"
-                            placeholder="Lösenord"
+                            placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="login-input"
@@ -132,7 +132,7 @@ const LogIn = () => {
                                     onClick={handleConnectWallet}
                                     className="wallet-button"
                                 >
-                                    {walletAddress ? `Ansluten: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'Anslut Wallet'}
+                                    {walletAddress ? `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
                                 </button>
                                 
                                 {showAccountSelector && availableAccounts.length > 0 && (
@@ -157,12 +157,12 @@ const LogIn = () => {
                             type="submit"
                             className="getstarted-button login-submit-button"
                         >
-                            {isRegisterMode ? 'Registrera' : 'Logga in'}
+                            {isRegisterMode ? 'Register' : 'Log in'}
                         </button>
                     </form>
                     
                     <p className="toggle-text">
-                        {isRegisterMode ? 'Har du redan ett konto?' : 'Har du inget konto?'}
+                        {isRegisterMode ? 'Do you already have an account?' : 'Do you not have an account?'}
                         {' '}
                         <button 
                             onClick={() => {
@@ -171,12 +171,12 @@ const LogIn = () => {
                             }}
                             className="toggle-link"
                         >
-                            {isRegisterMode ? 'Logga in här' : 'Registrera dig här'}
+                            {isRegisterMode ? 'Log in' : 'Register here'}
                         </button>
                     </p>
                     
                     {message && (
-                        <p className={`message ${message.includes('lyckades') ? 'success' : 'error'}`}>
+                        <p className={`message ${message.includes('success') ? 'success' : 'error'}`}>
                             {message}
                         </p>
                     )}

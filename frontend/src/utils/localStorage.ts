@@ -20,7 +20,7 @@ export const getAllUsers = (): User[] => {
     const usersJson = localStorage.getItem(STORAGE_KEYS.USERS);
     return usersJson ? JSON.parse(usersJson) : [];
   } catch (error) {
-    console.error('Fel vid hämtning av användare:', error);
+    console.error('Error during getting users:', error);
     return [];
   }
 };
@@ -29,7 +29,7 @@ const saveAllUsers = (users: User[]): void => {
   try {
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
   } catch (error) {
-    console.error('Fel vid sparande av användare:', error);
+    console.error('Error during saving users:', error);
   }
 };
 
@@ -42,11 +42,11 @@ export const registerUser = (
     const users = getAllUsers();
 
     if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-      return { success: false, message: 'Användarnamnet är redan upptaget' };
+      return { success: false, message: 'The username is already taken' };
     }
 
     if (users.some(user => user.walletAddress.toLowerCase() === walletAddress.toLowerCase())) {
-      return { success: false, message: 'Denna wallet är redan registrerad' };
+      return { success: false, message: 'This wallet is already registered' };
     }
 
     const newUser: User = {
@@ -69,12 +69,12 @@ export const registerUser = (
 
     return { 
       success: true, 
-      message: 'Registrering lyckades!', 
+      message: 'Registration successful!', 
       user: currentUser 
     };
   } catch (error) {
-    console.error('Fel vid registrering:', error);
-    return { success: false, message: 'Ett fel uppstod vid registrering' };
+    console.error('Error during registration:', error);
+    return { success: false, message: 'An error occurred during registration' };
   }
 };
 
@@ -89,7 +89,7 @@ export const loginUser = (
     );
 
     if (!user) {
-      return { success: false, message: 'Felaktigt användarnamn eller lösenord' };
+      return { success: false, message: 'Invalid username or password' };
     }
 
     const currentUser: CurrentUser = {
@@ -101,12 +101,12 @@ export const loginUser = (
 
     return { 
       success: true, 
-      message: 'Inloggning lyckades!', 
+      message: 'Login successful!', 
       user: currentUser 
     };
   } catch (error) {
-    console.error('Fel vid inloggning:', error);
-    return { success: false, message: 'Ett fel uppstod vid inloggning' };
+    console.error('Error during login:', error);
+    return { success: false, message: 'An error occurred during login' };
   }
 };
 
@@ -115,7 +115,7 @@ export const getCurrentUser = (): CurrentUser | null => {
     const userJson = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
     return userJson ? JSON.parse(userJson) : null;
   } catch (error) {
-    console.error('Fel vid hämtning av inloggad användare:', error);
+    console.error('Error during getting current user:', error);
     return null;
   }
 };
@@ -124,7 +124,7 @@ export const setCurrentUser = (user: CurrentUser): void => {
   try {
     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
   } catch (error) {
-    console.error('Fel vid sparande av inloggad användare:', error);
+    console.error('Error during saving current user:', error);
   }
 };
 
@@ -132,7 +132,7 @@ export const logoutUser = (): void => {
   try {
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
   } catch (error) {
-    console.error('Fel vid utloggning:', error);
+    console.error('Error during logout:', error);
   }
 };
 
@@ -142,14 +142,14 @@ export const updateWalletAddress = (
   try {
     const currentUser = getCurrentUser();
     if (!currentUser) {
-      return { success: false, message: 'Ingen användare är inloggad' };
+      return { success: false, message: 'No user is logged in' };
     }
 
     const users = getAllUsers();
     const userIndex = users.findIndex(u => u.username === currentUser.username);
 
     if (userIndex === -1) {
-      return { success: false, message: 'Användare hittades inte' };
+      return { success: false, message: 'User not found' };
     }
 
     const walletExists = users.some(
@@ -158,7 +158,7 @@ export const updateWalletAddress = (
     );
 
     if (walletExists) {
-      return { success: false, message: 'Denna wallet används redan av en annan användare' };
+      return { success: false, message: 'This wallet is already used by another user' };
     }
 
     users[userIndex].walletAddress = newWalletAddress;
@@ -167,10 +167,10 @@ export const updateWalletAddress = (
     currentUser.walletAddress = newWalletAddress;
     setCurrentUser(currentUser);
 
-    return { success: true, message: 'Wallet-adress uppdaterad!' };
+    return { success: true, message: 'Wallet address updated!' };
   } catch (error) {
-    console.error('Fel vid uppdatering av wallet:', error);
-    return { success: false, message: 'Ett fel uppstod vid uppdatering' };
+    console.error('Error during updating wallet:', error);
+    return { success: false, message: 'An error occurred during updating wallet' };
   }
 };
 
@@ -183,6 +183,6 @@ export const clearAllData = (): void => {
     localStorage.removeItem(STORAGE_KEYS.USERS);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
   } catch (error) {
-    console.error('Fel vid rensning av data:', error);
+    console.error('Error during clearing data:', error);
   }
 };
