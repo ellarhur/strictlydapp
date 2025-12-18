@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { useTracks } from '../contexts/TracksContext';
-import ModeButton from '../components/ModeButton';
 import '../index.css';
 
 const Balance = () => {
     const { tracks, currentTrack, setCurrentTrack } = useTracks();
+    const [paidThisMonth] = useState(0.01); // I ETH
 
     const handleTrackClick = (trackId: number) => {
         const track = tracks.find(t => t.id === trackId);
@@ -17,7 +18,6 @@ const Balance = () => {
         <>
             <div className="logo"><a href="/ListenerDashboard">Strictly</a></div>
             <Navbar />
-            <ModeButton />
             
             <h1 className="dashboard-title">Balance</h1>
             
@@ -25,7 +25,14 @@ const Balance = () => {
                 <div className="main-content">
                     <div className="recommended-tracks">
                         <h2>Paid this month</h2>
-                        <p>0.01 ETH</p>
+                        {paidThisMonth >= 0.01 ? (
+                            <p>0.01 ETH (sufficient funds to subscribe to Strictly)</p>
+                        ) : (
+                            <>
+                                <p>0.00 ETH</p>
+                                <button className="pay-now">Pay now to keep your subscription active</button>
+                            </>
+                        )}
                         <h2>Artists you have listened to</h2>
                     </div>
                 </div>
