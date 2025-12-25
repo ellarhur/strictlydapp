@@ -25,15 +25,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         return;
       }
 
-      // FORCERA wallet att visa account-väljare
-      await window.ethereum.request({
-        method: 'wallet_requestPermissions',
-        params: [{ eth_accounts: {} }]
-      });
-
-      // Nu hämta den valda account
+      // Enkel anslutning - visar wallet popup automatiskt
       const accounts = await window.ethereum.request({ 
-        method: 'eth_accounts' 
+        method: 'eth_requestAccounts' 
       });
 
       if (!accounts || accounts.length === 0) {

@@ -9,7 +9,7 @@ const Balance = () => {
         const track = tracks.find(t => t.id === trackId);
         if (track) {
             setCurrentTrack(track);
-        }
+        }w
     };
 
     return (
