@@ -1,12 +1,19 @@
 import Navbar from '../components/Navbar';
 import { useTracks } from '../contexts/TracksContext';
+import { useWallet } from '../contexts/WalletContext';
 import ModeButton from '../components/ModeButton';
 import '../index.css';
 
 const ListenerDashboard = () => {
     const { tracks, currentTrack, setCurrentTrack } = useTracks();
+    const { isConnected } = useWallet();
 
     const handleTrackClick = (trackId: number) => {
+        if (!isConnected) {
+            alert('You haven\'t connected a wallet yet. Please go to Balance to connect your wallet.');
+            return;
+        }
+        
         const track = tracks.find(t => t.id === trackId);
         if (track) {
             setCurrentTrack(track);
