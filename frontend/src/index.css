@@ -1,4 +1,55 @@
+/* === GLOBAL STYLES === */
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1D1C1C;
+  background: linear-gradient(175deg,rgba(29, 28, 28, 1) 53%, rgba(88, 81, 69, 1) 85%, rgba(231, 86, 42, 1) 100%);
+  font-family: "Lexend Deca", sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  width: 100%;
+}
 
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  font-family: "Lexend Deca", sans-serif;
+  font-weight: 400;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #7a2e2e;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+a {
+  color: #ebdfdf;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #3f6963;
+}
+
+/* === LANDING PAGE === */
 .landing-page-gradient {
   position: fixed;
   top: 0;
@@ -40,6 +91,7 @@
   color: #ebdfdf;
 }
 
+/* === BUTTONS === */
 .getstarted-button {
   padding: 15px 40px;
   font-size: 1.2em;
@@ -55,194 +107,33 @@
 .getstarted-button:hover {
   background-color: #1d1c1c;
   transform: scale(1.05);
-  border-color: transparent;
 }
 
-/* Login Page Styles */
-.login-form-container {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.login-input {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1em;
-  font-family: inherit;
-}
-
-.wallet-button {
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: #2a2a2a;
-  color: #ebdfdf;
-  border: 1px solid #444;
-  font-size: 1em;
-  font-family: inherit;
-}
-
-.wallet-button:hover {
-  background-color: #3a3a3a;
-  border-color: #7a2e2e;
-}
-
-.account-selector {
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-}
-
-.account-selector-title {
-  margin: 0 0 10px 0;
-  font-weight: bold;
-  color: #1d1c1c;
-}
-
-.account-button {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 5px;
-  cursor: pointer;
-  border-radius: 3px;
-  border: 1px solid #ddd;
-  background-color: white;
-  text-align: left;
-  font-family: inherit;
-  color: #1d1c1c;
-}
-
-.account-button:hover {
-  background-color: #f0f0f0;
-}
-
-.login-submit-button {
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.toggle-text {
-  margin-top: 15px;
-  color: #ebdfdf;
-}
-
-.toggle-link {
-  background: none;
+.connect-wallet-button {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  background-color: #7a2e2e;
+  color: white;
   border: none;
-  color: #7a2e2e;
-  cursor: pointer;
-  text-decoration: underline;
-  font-family: inherit;
-  font-size: 1em;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.toggle-link:hover {
-  color: #7a2e2e;
-}
-
-.message {
-  margin-top: 15px;
-}
-
-.message.success {
-  color: green;
-}
-
-.message.error {
-  color: red;
-}
-
-
-body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #1D1C1C;
-  background: linear-gradient(175deg,rgba(29, 28, 28, 1) 53%, rgba(88, 81, 69, 1) 85%, rgba(231, 86, 42, 1) 100%);
-  font-family: "Lexend Deca", sans-serif;
-  font-weight: 400;
-  min-height: 100vh;
-  width: 100%;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-  font-family: "Lexend Deca", sans-serif;
-  font-weight: 400;
-}
-
-button {
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #7a2e2e;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 20px;
 }
 
-nav {
-  position: fixed;
-  left: 150px;
-  top: 270px;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 0;
-  background-color: transparent;
-  list-style: none !important;
-  text-decoration: none;
-  line-height: 1.5;
-  font-size: 2rem;
-  z-index: 100;
+.connect-wallet-button:hover {
+  background-color: #1d1c1c;
+  transform: scale(1.05);
 }
 
-nav a:visited {
-  color: #ebdfdf;
+.connect-wallet-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
-nav ul {
-  color: #ebdfdf;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-nav li {
-  list-style: none;
-  color: #ebdfdf;
-}
-
+/* === LOGO === */
 .logo {
   position: fixed;
   left: 150px;
@@ -261,6 +152,7 @@ nav li {
   color: #e7562a;
 }
 
+/* === DASHBOARD LAYOUT === */
 .dashboard-title {
   position: fixed;
   left: 650px;
@@ -298,21 +190,49 @@ nav li {
   overflow-y: auto;
 }
 
+/* === NAVIGATION (används av Navbar-komponenten) === */
+nav {
+  position: fixed;
+  left: 150px;
+  top: 270px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0;
+  background-color: transparent;
+  list-style: none !important;
+  text-decoration: none;
+  line-height: 1.5;
+  font-size: 2rem;
+  z-index: 100;
+}
+
+nav a:visited {
+  color: #ebdfdf;
+}
 
 nav a:hover {
   color: #e7562a;
 }
 
-a {
+nav ul {
   color: #ebdfdf;
-  text-decoration: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-a:visited {
-  color: #3f6963;
+nav li {
+  list-style: none;
+  color: #ebdfdf;
 }
 
-
+/* === TRACKS DISPLAY === */
 .recommended-tracks {
   display: flex;
   flex-direction: column;
@@ -329,7 +249,6 @@ a:visited {
   width: 100%;
   box-sizing: border-box;
   height: 100%;
-
 }
 
 .trackcard {
@@ -370,7 +289,33 @@ a:visited {
   color: #aaa;
 }
 
-/* Upload Form Styles */
+.track-number {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #aaa;
+  min-width: 30px;
+  text-align: center;
+}
+
+.track-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.track-info h3 {
+  margin: 0;
+  font-size: 1.1em;
+  color: #ebdfdf;
+}
+
+.track-info p {
+  margin: 5px 0 0 0;
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+/* === UPLOAD FORM === */
 .upload-form {
   background-color: #2a2a2a;
   padding: 10px;
@@ -399,7 +344,6 @@ a:visited {
 
 .form-group input,
 .form-group select {
-  width: 100%;
   width: 500px;
   padding: 10px;
   border-radius: 6px;
@@ -433,82 +377,15 @@ a:visited {
   background-color: #535bf2;
 }
 
-/* Creator Dashboard Styles */
-
-.my-tracks {
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-  padding: 50px;
-  border-radius: 12px;
-  background-color: #1d1c1c;
-  color: #ebdfdf;
-  text-align: left;
-  font-family: "Lexend Deca", sans-serif;
-  font-size: 1.2em;
-  font-weight: 400;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.my-tracks .trackcard {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 8px;
-  background-color: #2a2a2a;
-  width: 100%;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.my-tracks .trackcard:hover {
-  background-color: #3a3a3a;
-}
-
-.track-number {
-  font-size: 1.5em;
+.upload-button {
+  margin: 20px 0;
+  padding: 12px 24px;
+  background-color: #7a2e2e;
+  color: white;
   font-weight: 600;
-  color: #aaa;
-  min-width: 30px;
-  text-align: center;
 }
 
-.my-tracks .trackcard img {
-  width: 60px;
-  height: 60px;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.track-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.track-info h3 {
-  margin: 0;
-  font-size: 1.1em;
-  color: #ebdfdf;
-}
-
-.track-info p {
-  margin: 5px 0 0 0;
-  color: #aaa;
-  font-size: 0.9em;
-}
-
-
-.genre {
-  font-size: 0.9em;
-  color: #888;
-  font-style: italic;
-}
-
+/* === SIDEBAR PLAYER === */
 .sidebar-player {
   width: 400px;
   min-width: 600px;
@@ -516,134 +393,6 @@ a:visited {
   height: 900px;
   min-height: auto;
   max-height: auto;
-}
-
-/* Mode Toggle Button with Transition */
-.mode-toggle-container {
-  position: fixed;
-  top: 50px;
-  right: 250px;
-  display: flex;
-  justify-content: center;
-  z-index: 200;
-}
-
-.mode-toggle {
-  position: relative;
-  display: inline-flex;
-  background-color: #2a2a2a;
-  border-radius: 50px;
-  padding: 4px;
-  gap: 4px;
-}
-
-.mode-toggle-slider {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  height: calc(100% - 8px);
-  background: #3f6963;
-  border-radius: 50px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 0;
-}
-
-.mode-toggle-slider.artist {
-  transform: translateX(calc(100% + 4px));
-}
-
-.mode-button {
-  display: flex;
-  z-index: 1;
-  padding: 12px 32px;
-  background: transparent;
-  color: #aaa;
-  border: none;
-  border-radius: 50px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  min-width: 120px;
-
-}
-
-.mode-button.active {
-  color: #fff;
-}
-
-.mode-button:hover {
-  border-color: transparent;
-}
-
-/* Wallet Status Button */
-.wallet-status-container {
-  position: fixed;
-  top: 50px;
-  right: 50px;
-  display: flex;
-  align-items: center;
-  z-index: 200;
-}
-
-.wallet-status-button {
-  padding: 12px 24px;
-  background-color: #2a2a2a;
-  color: #ebdfdf;
-  border: 2px solid #3f6963;
-  border-radius: 50px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.wallet-status-button:hover {
-  background-color: #3a3a3a;
-  border-color: #e7562a;
-  transform: scale(1.02);
-}
-
-.wallet-status-button.connected {
-  border-color: #3f6963;
-}
-
-.wallet-status-button.disconnected {
-  border-color: #7a2e2e;
-  opacity: 0.7;
-}
-
-.wallet-status-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #3f6963;
-}
-
-.wallet-status-button.disconnected .wallet-status-indicator {
-  background-color: #7a2e2e;
-}
-
-/* Legacy styles för compatibility */
-.listener-artist-mode {
-  display: flex;
-  gap: 10px;
-  margin: 20px;
-}
-
-.listener-mode,
-.artist-mode {
-  padding: 10px 20px;
-  background-color: #2a2a2a;
-}
-
-.listener-mode:hover,
-.artist-mode:hover {
-  background-color: #3a3a3a;
 }
 
 .streaming-window {
@@ -661,19 +410,6 @@ a:visited {
   color: #ebdfdf;
   font-family: "Lexend Deca", sans-serif;
   font-size: 1.2em;
-}
-
-.no-track-message {
-  color: #aaa;
-  font-size: 1.1em;
-}
-
-.upload-button {
-  margin: 20px 0;
-  padding: 12px 24px;
-  background-color: #7a2e2e;
-  color: white;
-  font-weight: 600;
 }
 
 .streaming-window img {
@@ -728,4 +464,67 @@ a:visited {
   border-radius: 20px;
   font-size: 0.9em;
   margin-top: 10px;
+}
+
+.no-track-message {
+  color: #aaa;
+  font-size: 1.1em;
+}
+
+/* === MODE TOGGLE (Listener/Artist) === */
+.mode-toggle-container {
+  position: fixed;
+  top: 50px;
+  right: 250px;
+  display: flex;
+  justify-content: center;
+  z-index: 200;
+}
+
+.mode-toggle {
+  position: relative;
+  display: inline-flex;
+  background-color: #2a2a2a;
+  border-radius: 50px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.mode-toggle-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: #3f6963;
+  border-radius: 50px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.mode-toggle-slider.artist {
+  transform: translateX(calc(100% + 4px));
+}
+
+.mode-button {
+  display: flex;
+  z-index: 1;
+  padding: 12px 32px;
+  background: transparent;
+  color: #aaa;
+  border: none;
+  border-radius: 50px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  min-width: 120px;
+}
+
+.mode-button.active {
+  color: #fff;
+}
+
+.mode-button:hover {
+  border-color: transparent;
 }
