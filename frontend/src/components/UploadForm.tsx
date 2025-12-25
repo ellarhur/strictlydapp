@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { TrackFormData } from '../types/track';
 import '../index.css';
+import { useWallet } from '../contexts/WalletContext';
+import { useStrictlyContract } from '../hooks/useStrictlyContract';
 
 interface UploadFormProps {
   onUpload: (trackData: TrackFormData) => void;
 }
 
 const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
+  const { signer } = useWallet();
+  const contract = useStrictlyContract(signer);
   const [formData, setFormData] = useState<TrackFormData>({
     title: '',
     artist: '',
@@ -18,20 +22,80 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
     audioUrl: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onUpload(formData);
-    // Reset form
-    setFormData({
-      title: '',
-      artist: '',
-      album: '',
-      genre: '',
-      royaltyWallet: '',
-      releaseDate: Date.now(),
-      imageUrl: '',
-      audioUrl: ''
-    });
+    
+    if (!contract || !signer) {
+      setError('Make sure your wallet is connected!');
+      return;
+    }
+
+    // 2. VALIDERING - Kolla att royaltyWallet är giltig
+    if (!formData.royaltyWallet.startsWith('0x') || formData.royaltyWallet.length !== 42) {
+      setError('Invalid wallet address');
+      return;
+    }
+
+    setIsUploading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      console.log('Making transaction on blockchain', formData);
+
+      const tx = await contract.addTrack(
+        formData.title,
+        formData.artist,
+        formData.album,
+        formData.genre,
+        formData.royaltyWallet,
+        Math.floor(formData.releaseDate / 1000)
+      );
+
+      console.log('Song uploaded, hash:', tx.hash);
+      setSuccessMessage('Wating for confirmation');
+
+      const receipt = await tx.wait();
+
+      console.log('Completed!', receipt);
+
+      setSuccessMessage('Thank you for adding your song');
+
+      onUpload(formData);
+
+      setTimeout(() => {
+        setFormData({
+          title: '',
+          artist: '',
+          album: '',
+          genre: '',
+          royaltyWallet: '',
+          releaseDate: Date.now(),
+          imageUrl: '',
+          audioUrl: ''
+        });
+        setSuccessMessage('');
+      }, 2000); 
+
+    } catch (err: any) {
+      console.error('Something went wrong:', err);
+      
+      if (err.code === 'ACTION_REJECTED' || err.code === 4001) {
+        setError('You cancelled the call');
+      } else if (err.message?.includes('title required')) {
+        setError('Must have a title');
+      } else if (err.message?.includes('wallet required')) {
+        setError('Must set a royalty wallet');
+      } else {
+        setError(`Something went wrong: ${err.message || 'Unknown'}`);
+      }
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -55,6 +119,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           value={formData.title}
           onChange={handleChange}
           required
+          disabled={isUploading}
         />
       </div>
 
@@ -67,6 +132,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           value={formData.artist}
           onChange={handleChange}
           required
+          disabled={isUploading}
         />
       </div>
 
@@ -78,6 +144,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           name="album"
           value={formData.album}
           onChange={handleChange}
+          disabled={isUploading}
         />
       </div>
 
@@ -89,6 +156,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           value={formData.genre}
           onChange={handleChange}
           required
+          disabled={isUploading}
         >
           <option value="">Select Genre</option>
           <option value="Electronic">Electronic</option>
@@ -98,6 +166,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           <option value="Jazz">Jazz</option>
           <option value="Classical">Classical</option>
           <option value="Ambient">Ambient</option>
+          <option value="Alternative">Alternative</option>
           <option value="Other">Other</option>
         </select>
       </div>
@@ -112,6 +181,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           onChange={handleChange}
           placeholder="0x..."
           required
+          disabled={isUploading}
         />
       </div>
 
@@ -124,12 +194,29 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           value={formData.imageUrl}
           onChange={handleChange}
           placeholder="https://..."
+          disabled={isUploading}
         />
       </div>
 
-      <button type="submit" className="submit-button">
-        Upload Track
+      <button 
+        type="submit" 
+        className="submit-button"
+        disabled={isUploading}
+      >
+        {isUploading ? 'Uploading...' : 'Upload Track'}
       </button>
+
+      {error && (
+        <p className="upload-error-message">
+          {error}
+        </p>
+      )}
+
+      {successMessage && (
+        <p className="upload-success-message">
+          {successMessage}
+        </p>
+      )}
     </form>
   );
 };

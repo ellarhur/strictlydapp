@@ -5,7 +5,6 @@ const ModeButton = () => {
     const navigate = useNavigate();
     const location = useLocation();
     
-    // Kolla vilken sida vi är på
     const isCreatorMode = location.pathname === '/CreatorDashboard';
 
     return (
