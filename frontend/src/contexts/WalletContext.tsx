@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { BrowserProvider, JsonRpcSigner } from 'ethers';
+
 interface WalletContextType {
   address: string | null;          
   provider: BrowserProvider | null;
@@ -8,6 +9,7 @@ interface WalletContextType {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
 }
+
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -23,14 +25,23 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         return;
       }
 
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
+      // FORCERA wallet att visa account-väljare
+      await window.ethereum.request({
+        method: 'wallet_requestPermissions',
+        params: [{ eth_accounts: {} }]
       });
 
+      // Nu hämta den valda account
+      const accounts = await window.ethereum.request({ 
+        method: 'eth_accounts' 
+      });
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error('Ingen account vald');
+      }
+
       const browserProvider = new BrowserProvider(window.ethereum);
-      
       const walletSigner = await browserProvider.getSigner();
-      
       const userAddress = await walletSigner.getAddress();
 
       setProvider(browserProvider);
@@ -51,6 +62,14 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   const disconnectWallet = () => {
+    // Försök revoke permissions från wallet
+    if (window.ethereum?.request) {
+      window.ethereum.request({
+        method: 'wallet_revokePermissions',
+        params: [{ eth_accounts: {} }]
+      }).catch(err => console.log('Revoke permissions error (ignoreras):', err));
+    }
+    
     setAddress(null);
     setProvider(null);
     setSigner(null);
@@ -73,11 +92,11 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       window.location.reload();
     };
 
-    window.ethereum.on('accountsChanged', handleAccountsChanged);
-    window.ethereum.on('chainChanged', handleChainChanged);
+    window.ethereum.on?.('accountsChanged', handleAccountsChanged);
+    window.ethereum.on?.('chainChanged', handleChainChanged);
 
     return () => {
-      if (window.ethereum.removeListener) {
+      if (window.ethereum?.removeListener) {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
         window.ethereum.removeListener('chainChanged', handleChainChanged);
       }
