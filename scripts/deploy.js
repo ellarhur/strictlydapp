@@ -5,7 +5,6 @@ const { ethers } = await network.connect();
 async function main() {
   console.log("Deploying Strictly contract to Base Sepolia...");
 
-  // Sätt månadsavgiften (0.01 ETH som exempel)
   const monthlyFee = ethers.parseEther("0.01");
   
   console.log(`Monthly fee: ${monthlyFee.toString()} wei (${ethers.formatEther(monthlyFee)} ETH)`);
@@ -20,11 +19,9 @@ async function main() {
   console.log(`✅ Strictly deployed to: ${address}`);
   console.log(`📝 Save this address for your frontend!`);
   
-  // Visa nätverksinformation
   const networkInfo = await ethers.provider.getNetwork();
   console.log(`Network: ${networkInfo.name} (chainId: ${networkInfo.chainId})`);
   
-  // Vänta lite innan verifiering
   console.log("\nWaiting for block confirmations...");
   await strictly.deploymentTransaction()?.wait(5);
   

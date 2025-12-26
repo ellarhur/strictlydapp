@@ -2,7 +2,7 @@ import '../index.css';
 import { useWallet } from '../contexts/WalletContext';
 
 const Navbar = () => {
-    const { address, isConnected, disconnectWallet } = useWallet();
+    const { disconnectWallet } = useWallet();
 
     const handleDisconnect = () => {
         disconnectWallet();
