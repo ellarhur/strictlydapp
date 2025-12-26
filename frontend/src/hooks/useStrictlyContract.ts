@@ -11,6 +11,11 @@ export const useStrictlyContract = (signer: JsonRpcSigner | null) => {
       return null;
     }
 
+    if (!STRICTLY_CONTRACT_ADDRESS || !STRICTLY_CONTRACT_ADDRESS.startsWith('0x')) {
+      console.log('⚠️ Ingen giltig kontraktsadress satt (VITE_STRICTLY_CONTRACT_ADDRESS saknas).');
+      return null;
+    }
+
     const newContract = new Contract(
       STRICTLY_CONTRACT_ADDRESS,
       STRICTLY_ABI,                

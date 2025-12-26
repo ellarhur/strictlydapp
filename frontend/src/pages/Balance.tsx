@@ -34,7 +34,10 @@ const Balance = () => {
     // Hämta contract data
     useEffect(() => {
         const fetchContractData = async () => {
-            if (!contract || !address) return;
+            if (!contract || !address) {
+                setLoading(false);
+                return;
+            }
 
             try {
                 setLoading(true);
@@ -74,7 +77,21 @@ const Balance = () => {
         try {
             setIsSubscribing(true);
 
+            // Preflight: undvik revert (och "missing revert data") genom att kolla state först
+            const period = await contract.currentPeriod();
+            const alreadyPaid = await contract.hasPaidForPeriod(address, period);
+            if (alreadyPaid) {
+                setHasSubscription(true);
+                alert(`You already have an active subscription for period ${Number(period)}! ✅`);
+                return;
+            }
+
             const fee = await contract.monthlyFee();
+            if (!fee || fee <= 0n) {
+                alert('Contract monthly fee is 0 - cannot subscribe.');
+                return;
+            }
+
             const tx = await contract.subscribe({ value: fee });
 
             console.log('Subscribing, transaction hash:', tx.hash);
@@ -93,6 +110,8 @@ const Balance = () => {
                 alert('You cancelled the subscription');
             } else if (error.message?.includes('already paid')) {
                 alert('You already have an active subscription for this period!');
+            } else if (error.message?.includes('incorrect fee')) {
+                alert('Incorrect subscription fee. Try refreshing the page to reload the fee from the contract.');
             } else {
                 alert(`Subscription failed: ${error.message || 'Unknown error'}`);
             }

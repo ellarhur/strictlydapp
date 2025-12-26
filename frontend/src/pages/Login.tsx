@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../contexts/WalletContext';
+import { NETWORK_NAME } from '../utils/contractConfig';
 import '../index.css';
 
 const Login = () => {
@@ -54,7 +55,7 @@ const Login = () => {
                             We support MetaMask, Coinbase Wallet, and other Web3 wallets.
                         </p>
                         <p className="wallet-info-text">
-                            Make sure you're on the Base Sepolia network.
+                            Make sure you're on the {NETWORK_NAME} network.
                         </p>
                     </div>
 

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { BrowserProvider, JsonRpcSigner } from 'ethers';
+import { NETWORK_CHAIN_ID, NETWORK_NAME } from '../utils/contractConfig';
 
 interface WalletContextType {
   address: string | null;          
@@ -21,6 +22,30 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const ensureCorrectNetwork = useCallback(async () => {
+    if (!window.ethereum?.request || !NETWORK_CHAIN_ID) return;
+
+    const desiredHex = `0x${NETWORK_CHAIN_ID.toString(16)}`;
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: desiredHex }]
+      });
+    } catch (err: any) {
+      // 4902 = okänt nätverk i wallet
+      if (err?.code === 4902) {
+        alert(`Nätverket "${NETWORK_NAME}" finns inte i din wallet. Lägg till det manuellt och försök igen.`);
+        return;
+      }
+      // 4001 = användaren nekade
+      if (err?.code === 4001) {
+        alert(`Byt till "${NETWORK_NAME}" i din wallet för att använda appen.`);
+        return;
+      }
+      console.log('Kunde inte byta nätverk automatiskt (ignoreras):', err);
+    }
+  }, []);
 
   const disconnectWallet = useCallback(() => {
     // Försök revoke permissions från wallet
@@ -58,6 +83,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         throw new Error('Ingen account vald');
       }
 
+      // Försök att byta till rätt chain innan vi skapar provider/signer
+      await ensureCorrectNetwork();
+
       const browserProvider = new BrowserProvider(window.ethereum);
       const walletSigner = await browserProvider.getSigner();
       const userAddress = await walletSigner.getAddress();
@@ -80,7 +108,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         alert('Kunde inte ansluta till wallet');
       }
     }
-  }, []);
+  }, [ensureCorrectNetwork]);
 
   // Auto-connect vid mount om användaren var tidigare connectad
   useEffect(() => {
@@ -98,6 +126,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           });
 
           if (accounts && accounts.length > 0) {
+            await ensureCorrectNetwork();
             const browserProvider = new BrowserProvider(window.ethereum);
             const walletSigner = await browserProvider.getSigner();
             const userAddress = await walletSigner.getAddress();
@@ -122,7 +151,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     };
 
     autoConnect();
-  }, []);
+  }, [ensureCorrectNetwork]);
 
   // Event listeners för account/chain ändringar
   useEffect(() => {

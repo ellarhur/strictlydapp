@@ -1,5 +1,29 @@
 # strictlydapp
 My prototype dApp for a decentralized music streaming platform.
+
+## Deploy till Ethereum Sepolia (testnet)
+
+### 1) Sätt env-variabler (i projektroten)
+- `SEPOLIA_RPC_URL`: din Sepolia RPC (t.ex. från Alchemy/Infura)
+- `PRIVATE_KEY`: privatnyckeln till kontot som har Sepolia ETH (eller använd `SEPOLIA_PRIVATE_KEY`)
+- (valfritt) `ETHERSCAN_API_KEY`: för verifiering
+- (valfritt) `MONTHLY_FEE_ETH`: default är `0.01`
+
+### 2) Deploy
+Kör:
+- `npx hardhat run scripts/deploy.js --network sepolia`
+
+Spara kontraktsadressen som skrivs ut.
+
+### 3) Frontend: peka på rätt kontrakt + chain
+Frontend läser från Vite-env. Skapa t.ex. `frontend/.env.local` och sätt:
+- `VITE_STRICTLY_CONTRACT_ADDRESS=0x...`
+- `VITE_NETWORK_CHAIN_ID=11155111`
+- `VITE_NETWORK_NAME=Ethereum Sepolia`
+
+### 4) (Valfritt) Verifiera kontrakt
+Deploy-scriptet skriver ut exakt verify-kommando, t.ex.:
+- `npx hardhat verify --network sepolia <address> "<constructorArg>"`
 1) Project idea summary
 My thesis project, Strictly, aims to develop a prototype of a decentralized music
 streaming platform that enables automatic, transparent, and direct royalty payments

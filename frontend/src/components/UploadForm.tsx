@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { TrackFormData } from '../types/track';
+import { TrackFormData, Track } from '../types/track';
 import '../index.css';
 import { useWallet } from '../contexts/WalletContext';
 import { useStrictlyContract } from '../hooks/useStrictlyContract';
 
 interface UploadFormProps {
-  onUpload: (trackData: TrackFormData) => void;
+  onUpload: (track: Track) => void;
 }
 
 const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
-  const { signer } = useWallet();
+  const { signer, address } = useWallet();
   const contract = useStrictlyContract(signer);
   const [formData, setFormData] = useState<TrackFormData>({
     title: '',
@@ -65,7 +65,40 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
 
       setSuccessMessage('Thank you for adding your song');
 
-      onUpload(formData);
+      // Försök läsa trackId från TrackAdded-eventet så UI får rätt on-chain id
+      let onChainTrackId: number | null = null;
+      try {
+        for (const log of receipt?.logs || []) {
+          if (!log || !log.address) continue;
+          if (log.address.toLowerCase() !== (await contract.getAddress()).toLowerCase()) continue;
+          try {
+            const parsed = contract.interface.parseLog(log);
+            if (parsed?.name === 'TrackAdded') {
+              onChainTrackId = Number(parsed.args.trackId);
+              break;
+            }
+          } catch {
+            // ignore logs that don't belong to Strictly ABI
+          }
+        }
+      } catch {
+        // ignore parsing errors and fallback below
+      }
+
+      // Fallback: om vi inte hittade eventet, använd (trackCount - 1)
+      if (onChainTrackId === null) {
+        const count = await contract.trackCount();
+        onChainTrackId = Math.max(0, Number(count) - 1);
+      }
+
+      const newTrack: Track = {
+        id: onChainTrackId,
+        ...formData,
+        uploader: address || '',
+        exists: true,
+      };
+
+      onUpload(newTrack);
 
       setTimeout(() => {
         setFormData({

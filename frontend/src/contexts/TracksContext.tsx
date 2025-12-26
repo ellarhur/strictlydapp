@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Track } from '../types/track';
+import { STRICTLY_CONTRACT_ADDRESS } from '../utils/contractConfig';
 
 interface TracksContextType {
   tracks: Track[];
@@ -11,6 +12,13 @@ interface TracksContextType {
 
 const TracksContext = createContext<TracksContextType | undefined>(undefined);
 
+type StoredTracksPayload =
+  | Track[]
+  | {
+      contractAddress: string;
+      tracks: Track[];
+    };
+
 export const TracksProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -18,14 +26,44 @@ export const TracksProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   useEffect(() => {
     const storedTracks = localStorage.getItem('strictly_tracks');
     if (storedTracks) {
-      setTracks(JSON.parse(storedTracks));
+      try {
+        const parsed: StoredTracksPayload = JSON.parse(storedTracks);
+
+        // Äldre format (bara array) saknar contractAddress => rensa för att undvika id-mismatch efter redeploy.
+        if (Array.isArray(parsed)) {
+          localStorage.removeItem('strictly_tracks');
+          setTracks([]);
+          return;
+        }
+
+        // Nytt format: validera att vi är på samma kontrakt
+        const storedAddress = (parsed.contractAddress || '').toLowerCase();
+        const currentAddress = (STRICTLY_CONTRACT_ADDRESS || '').toLowerCase();
+
+        if (storedAddress && currentAddress && storedAddress !== currentAddress) {
+          localStorage.removeItem('strictly_tracks');
+          setTracks([]);
+          return;
+        }
+
+        setTracks(parsed.tracks || []);
+      } catch {
+        localStorage.removeItem('strictly_tracks');
+        setTracks([]);
+      }
     }
   }, []);
 
   const addTrack = (track: Track) => {
     const updatedTracks = [...tracks, track];
     setTracks(updatedTracks);
-    localStorage.setItem('strictly_tracks', JSON.stringify(updatedTracks));
+    localStorage.setItem(
+      'strictly_tracks',
+      JSON.stringify({
+        contractAddress: STRICTLY_CONTRACT_ADDRESS,
+        tracks: updatedTracks,
+      })
+    );
   };
 
   const getTrackById = (id: number): Track | undefined => {

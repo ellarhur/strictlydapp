@@ -6,7 +6,7 @@ import ModeButton from '../components/ModeButton';
 import { useTracks } from '../contexts/TracksContext';
 import { useWallet } from '../contexts/WalletContext';
 import { useStrictlyContract } from '../hooks/useStrictlyContract';
-import { TrackFormData, Track } from '../types/track';
+import { Track } from '../types/track';
 import '../index.css';
 
 const CreatorDashboard = () => {
@@ -40,17 +40,10 @@ const CreatorDashboard = () => {
     fetchTrackCount();
   }, [contract]);
 
-  const handleUpload = (trackData: TrackFormData) => {
-    const newTrack: Track = {
-      id: tracks.length + 1,
-      ...trackData,
-      uploader: address || '',
-      exists: true
-    };
-    
+  const handleUpload = (newTrack: Track) => {
     addTrack(newTrack);
     setShowUploadForm(false);
-    alert(`Track "${trackData.title}" uploaded successfully!`);
+    alert(`Track "${newTrack.title}" uploaded successfully!`);
   };
 
   const myTracks = tracks.filter(track => track.uploader === address);
