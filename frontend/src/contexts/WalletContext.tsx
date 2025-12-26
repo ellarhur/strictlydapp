@@ -1,24 +1,48 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { BrowserProvider, JsonRpcSigner } from 'ethers';
 
 interface WalletContextType {
   address: string | null;          
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
-  isConnected: boolean; 
+  isConnected: boolean;
+  isLoading: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'strictly_wallet_connected';
+
 export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const connectWallet = async () => {
+  const disconnectWallet = useCallback(() => {
+    // Försök revoke permissions från wallet
+    if (window.ethereum?.request) {
+      window.ethereum.request({
+        method: 'wallet_revokePermissions',
+        params: [{ eth_accounts: {} }]
+      }).catch(err => console.log('Revoke permissions error (ignoreras):', err));
+    }
+    
+    setAddress(null);
+    setProvider(null);
+    setSigner(null);
+    setIsConnected(false);
+    
+    // Ta bort från localStorage
+    localStorage.removeItem(STORAGE_KEY);
+    
+    console.log('🔌 Wallet frånkopplad');
+  }, []);
+
+  const connectWallet = useCallback(async () => {
     try {
       if (!window.ethereum) {
         alert('Ingen Web3 wallet hittades! Installera MetaMask eller Coinbase Wallet.');
@@ -43,6 +67,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       setAddress(userAddress);
       setIsConnected(true);
 
+      // Spara till localStorage att användaren har connectat
+      localStorage.setItem(STORAGE_KEY, 'true');
+
       console.log('✅ Wallet ansluten:', userAddress);
     } catch (error: any) {
       console.error('❌ Fel vid anslutning till wallet:', error);
@@ -53,36 +80,73 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         alert('Kunde inte ansluta till wallet');
       }
     }
-  };
+  }, []);
 
-  const disconnectWallet = () => {
-    // Försök revoke permissions från wallet
-    if (window.ethereum?.request) {
-      window.ethereum.request({
-        method: 'wallet_revokePermissions',
-        params: [{ eth_accounts: {} }]
-      }).catch(err => console.log('Revoke permissions error (ignoreras):', err));
-    }
-    
-    setAddress(null);
-    setProvider(null);
-    setSigner(null);
-    setIsConnected(false);
-    console.log('🔌 Wallet frånkopplad');
-  };
+  // Auto-connect vid mount om användaren var tidigare connectad
+  useEffect(() => {
+    const autoConnect = async () => {
+      setIsLoading(true);
 
+      // Kolla om användaren var tidigare connectad
+      const wasConnected = localStorage.getItem(STORAGE_KEY);
+      
+      if (wasConnected === 'true' && window.ethereum) {
+        try {
+          // Försök hämta accounts utan popup (om permission redan givits)
+          const accounts = await window.ethereum.request({ 
+            method: 'eth_accounts' // Använd eth_accounts istället för eth_requestAccounts
+          });
+
+          if (accounts && accounts.length > 0) {
+            const browserProvider = new BrowserProvider(window.ethereum);
+            const walletSigner = await browserProvider.getSigner();
+            const userAddress = await walletSigner.getAddress();
+
+            setProvider(browserProvider);
+            setSigner(walletSigner);
+            setAddress(userAddress);
+            setIsConnected(true);
+
+            console.log('✅ Auto-connectad till wallet:', userAddress);
+          } else {
+            // Ingen account tillgänglig, rensa localStorage
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        } catch (error) {
+          console.error('Auto-connect misslyckades:', error);
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    autoConnect();
+  }, []);
+
+  // Event listeners för account/chain ändringar
   useEffect(() => {
     if (!window.ethereum) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
+      console.log('🔄 accountsChanged event:', accounts);
+      
       if (accounts.length === 0) {
+        // Användaren har disconnectat i MetaMask
+        console.log('❌ Inga accounts, disconnectar...');
         disconnectWallet();
-      } else {
+      } else if (accounts[0].toLowerCase() !== address?.toLowerCase()) {
+        // Endast re-connecta om adressen faktiskt ändrats
+        console.log('🔄 Ny adress detekterad, re-connectar...');
         connectWallet();
+      } else {
+        // Samma adress, ignorera (händer ofta efter transactions)
+        console.log('✅ Samma adress, ignorerar event');
       }
     };
 
     const handleChainChanged = () => {
+      console.log('⛓️ Chain ändrades, reloading...');
       window.location.reload();
     };
 
@@ -95,7 +159,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         window.ethereum.removeListener('chainChanged', handleChainChanged);
       }
     };
-  }, []);
+  }, [connectWallet, disconnectWallet, address]);
 
   return (
     <WalletContext.Provider 
@@ -103,7 +167,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         address,          
         provider,       
         signer,         
-        isConnected, 
+        isConnected,
+        isLoading,
         connectWallet,
         disconnectWallet
       }}

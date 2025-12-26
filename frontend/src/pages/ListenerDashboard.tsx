@@ -1,22 +1,88 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useTracks } from '../contexts/TracksContext';
 import { useWallet } from '../contexts/WalletContext';
+import { useStrictlyContract } from '../hooks/useStrictlyContract';
 import ModeButton from '../components/ModeButton';
 import '../index.css';
 
 const ListenerDashboard = () => {
+    const navigate = useNavigate();
     const { tracks, currentTrack, setCurrentTrack } = useTracks();
-    const { isConnected } = useWallet();
+    const { isConnected, isLoading: walletLoading, signer, address } = useWallet();
+    const contract = useStrictlyContract(signer);
+    const [isPlayingTrack, setIsPlayingTrack] = useState(false);
+    const [hasSubscription, setHasSubscription] = useState(false);
 
-    const handleTrackClick = (trackId: number) => {
-        if (!isConnected) {
-            alert('You haven\'t connected a wallet yet. Please go to Balance to connect your wallet.');
+    // Redirecta till login om inte ansluten (vänta på loading)
+    useEffect(() => {
+        if (!walletLoading && !isConnected) {
+            navigate('/login');
+        }
+    }, [walletLoading, isConnected, navigate]);
+
+    // Kolla subscription status
+    useEffect(() => {
+        const checkSubscription = async () => {
+            if (!contract || !address) return;
+
+            try {
+                const hasSub = await contract.hasActiveSubscription(address);
+                setHasSubscription(hasSub);
+            } catch (error) {
+                console.error('Error checking subscription:', error);
+            }
+        };
+
+        checkSubscription();
+    }, [contract, address]);
+
+    const handleTrackClick = async (trackId: number) => {
+        if (!contract) {
+            alert('Contract not connected!');
             return;
         }
-        
-        const track = tracks.find(t => t.id === trackId);
-        if (track) {
-            setCurrentTrack(track);
+
+        if (!hasSubscription) {
+            alert('You need an active subscription to play tracks! Go to Balance to subscribe.');
+            return;
+        }
+
+        try {
+            setIsPlayingTrack(true);
+
+            // 1. Registrera play i contract (blockchain transaction)
+            console.log(`Recording play for track ${trackId}...`);
+            const tx = await contract.playTrack(trackId);
+            console.log('Play recorded, transaction hash:', tx.hash);
+            
+            // Vänta på bekräftelse (valfritt - kan också bara fortsätta)
+            await tx.wait();
+            console.log('Play confirmed on blockchain! ✅');
+
+            // 2. Sätt track som current i UI
+            const track = tracks.find(t => t.id === trackId);
+            if (track) {
+                setCurrentTrack(track);
+            }
+
+        } catch (error: any) {
+            console.error('Error playing track:', error);
+            
+            if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
+                alert('You cancelled the play transaction');
+            } else if (error.message?.includes('subscription inactive')) {
+                alert('Your subscription is not active! Go to Balance to subscribe.');
+            } else if (error.message?.includes('track not released')) {
+                alert('This track is not released yet!');
+            } else if (error.message?.includes('track missing')) {
+                alert('Track not found in contract');
+            } else {
+                alert(`Error playing track: ${error.message || 'Unknown error'}`);
+            }
+        } finally {
+            setIsPlayingTrack(false);
         }
     };
 
@@ -28,10 +94,34 @@ const ListenerDashboard = () => {
             
             <h1 className="dashboard-title">Listen to your favourite tracks</h1>
             
+            {!hasSubscription && (
+                <div style={{ 
+                    textAlign: 'center', 
+                    padding: '10px', 
+                    background: '#ff6b6b', 
+                    color: 'white',
+                    margin: '10px 0'
+                }}>
+                    ⚠️ No active subscription! Go to Balance to subscribe.
+                </div>
+            )}
+
+            {isPlayingTrack && (
+                <div style={{ 
+                    textAlign: 'center', 
+                    padding: '10px', 
+                    background: '#51cf66', 
+                    color: 'white',
+                    margin: '10px 0'
+                }}>
+                    🎵 Recording play on blockchain...
+                </div>
+            )}
+            
             <div className="dashboard-layout">
                 <div className="main-content">
                     <div className="recommended-tracks">
-                        <h2>Latest uploaded tracks</h2>
+                        <h2>Latest uploaded tracks {hasSubscription && '✅'}</h2>
                         {tracks.slice().reverse().slice(0, 3).map(track => (
                             <div 
                                 key={track.id} 

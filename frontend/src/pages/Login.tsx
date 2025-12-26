@@ -5,19 +5,34 @@ import '../index.css';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { isConnected, connectWallet } = useWallet();
+    const { isConnected, isLoading, connectWallet } = useWallet();
 
-    // Om wallet redan är ansluten, redirecta direkt
+    // Om wallet redan är ansluten, redirecta direkt (vänta på loading)
     useEffect(() => {
-        if (isConnected) {
+        if (!isLoading && isConnected) {
             navigate('/ListenerDashboard');
         }
-    }, [isConnected, navigate]);
+    }, [isLoading, isConnected, navigate]);
 
     const handleConnectWallet = async () => {
         await connectWallet();
         // Efter lyckad anslutning kommer useEffect att redirecta
     };
+
+    // Visa loading medan vi kollar auto-connect
+    if (isLoading) {
+        return (
+            <>
+                <div className="landing-page-gradient"></div>
+                <div className="home-container">
+                    <div className="introduction">
+                        <h1>Loading...</h1>
+                        <p>Checking wallet connection...</p>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>

@@ -1,20 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import UploadForm from '../components/UploadForm';
 import ModeButton from '../components/ModeButton';
 import { useTracks } from '../contexts/TracksContext';
+import { useWallet } from '../contexts/WalletContext';
+import { useStrictlyContract } from '../hooks/useStrictlyContract';
 import { TrackFormData, Track } from '../types/track';
 import '../index.css';
 
 const CreatorDashboard = () => {
+  const navigate = useNavigate();
   const { tracks, addTrack } = useTracks();
+  const { address, isConnected, isLoading: walletLoading, signer } = useWallet();
+  const contract = useStrictlyContract(signer);
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [totalTrackCount, setTotalTrackCount] = useState<number>(0);
+
+  // Redirecta till login om inte ansluten (vänta på loading)
+  useEffect(() => {
+    if (!walletLoading && !isConnected) {
+      navigate('/login');
+    }
+  }, [walletLoading, isConnected, navigate]);
+
+  // Hämta total track count från contract
+  useEffect(() => {
+    const fetchTrackCount = async () => {
+      if (!contract) return;
+
+      try {
+        const count = await contract.trackCount();
+        setTotalTrackCount(Number(count));
+      } catch (error) {
+        console.error('Error fetching track count:', error);
+      }
+    };
+
+    fetchTrackCount();
+  }, [contract]);
 
   const handleUpload = (trackData: TrackFormData) => {
     const newTrack: Track = {
       id: tracks.length + 1,
       ...trackData,
-      uploader: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1",
+      uploader: address || '',
       exists: true
     };
     
@@ -23,7 +53,7 @@ const CreatorDashboard = () => {
     alert(`Track "${trackData.title}" uploaded successfully!`);
   };
 
-  const myTracks = tracks.filter(track => track.uploader === "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1");
+  const myTracks = tracks.filter(track => track.uploader === address);
 
   return (
     <>
@@ -35,7 +65,11 @@ const CreatorDashboard = () => {
       
       <div className="dashboard-layout">
         <div className="main-content">
-        
+          <div className="wallet-info-box" style={{ marginBottom: '20px' }}>
+            <p className="wallet-info-label">
+              Total Tracks on Platform: {totalTrackCount}
+            </p>
+          </div>
 
           <div className="recommended-tracks">
             <h2>My Tracks ({myTracks.length})</h2>
