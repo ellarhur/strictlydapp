@@ -6,7 +6,7 @@ import '../index.css';
 
 const Balance = () => {
     const { currentTrack } = useTracks();
-    const { address, isConnected } = useWallet();
+    const { address, isConnected, connectWallet } = useWallet();
 
     const handleSubscribe = () => {
         alert('Subscription functionality coming soon!');
@@ -35,19 +35,21 @@ const Balance = () => {
                                     ≈ 270 SEK per month
                                 </p>
                             </div>
-
                             {isConnected ? (
-                                <button 
-                                    onClick={handleSubscribe}
-                                    className="subscribe-button"
-                                >
-                                    Subscribe Now
-                                </button>
-                            ) : (
-                                <p className="wallet-warning">
-                                    Please connect your wallet to subscribe
-                                </p>
-                            )}
+  <button 
+    onClick={handleSubscribe}
+    className="subscribe-button"
+  >
+    Subscribe Now
+  </button>
+) : (
+  <button 
+    onClick={connectWallet}  // Från useWallet hook
+    className="connect-wallet-button"
+  >
+    Connect Wallet
+  </button>
+)}
                         </div>
 
                         <div className="distribution-box">

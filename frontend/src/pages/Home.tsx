@@ -11,7 +11,7 @@ const Home = () => {
                     <h1>Strictly</h1>
                     <p>Support your favourite artists directly.</p>
                     <button onClick={() => {
-                        navigate('/ListenerDashboard');
+                        navigate('/login');
                     }} className="getstarted-button">Get started</button>
                 </div>
        
