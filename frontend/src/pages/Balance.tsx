@@ -10,7 +10,7 @@ import '../index.css';
 
 const Balance = () => {
     const navigate = useNavigate();
-    const { currentTrack } = useTracks();
+    const { currentTrack, tracks } = useTracks();
     const { address, isConnected, isLoading: walletLoading, signer } = useWallet();
     const contract = useStrictlyContract(signer);
 
@@ -20,8 +20,9 @@ const Balance = () => {
     const [currentPeriod, setCurrentPeriod] = useState<number>(0);
     const [hasSubscription, setHasSubscription] = useState<boolean>(false);
     const [playedTracks, setPlayedTracks] = useState<number[]>([]);
+    const [playedStats, setPlayedStats] = useState<{ trackId: number; plays: number; title: string; artist: string; percent: number }[]>([]);
+    const [isLoadingWrapped, setIsLoadingWrapped] = useState(false);
     const [isSubscribing, setIsSubscribing] = useState(false);
-    const [isSettling, setIsSettling] = useState(false);
     const [loading, setLoading] = useState(true);
 
     // Redirecta till login om inte ansluten (vänta på loading)
@@ -60,6 +61,7 @@ const Balance = () => {
                     const tracks = await contract.playedTrackIdsByPeriod(address, current);
                     setPlayedTracks(tracks.map((t: bigint) => Number(t)));
                 }
+                setPlayedStats([]); // reset så vi inte visar gammal wrapped om period ändras
 
             } catch (error) {
                 console.error('Fel vid hämtning av contract data:', error);
@@ -70,6 +72,51 @@ const Balance = () => {
 
         fetchContractData();
     }, [contract, address]);
+
+    // Hämta plays per track för "Your Wrapped"
+    useEffect(() => {
+        const fetchWrapped = async () => {
+            if (!contract || !address || !hasSubscription || playedTracks.length === 0) {
+                setPlayedStats([]);
+                return;
+            }
+            setIsLoadingWrapped(true);
+            try {
+                const current = await contract.currentPeriod();
+                    const trackIds = playedTracks;
+                // Hämta total plays för perioden
+                const totalPlays = await contract.totalTrackPlays(address, current);
+                const total = Number(totalPlays);
+                if (total === 0) {
+                    setPlayedStats([]);
+                    return;
+                }
+
+                const stats: { trackId: number; plays: number; title: string; artist: string; percent: number }[] = [];
+                for (const id of trackIds) {
+                    const playsBn = await contract.playsForTrack(address, current, id);
+                    const plays = Number(playsBn);
+                    if (plays === 0) continue;
+                    const trackMeta = currentTrack?.id === id ? currentTrack : tracks.find((t) => t.id === id);
+                    const title = trackMeta?.title || `Track #${id}`;
+                    const artist = trackMeta?.artist || 'Unknown artist';
+                    const percent = Math.round((plays / total) * 1000) / 10; // en decimal
+                    stats.push({ trackId: id, plays, title, artist, percent });
+                }
+                // Sortera störst först
+                stats.sort((a, b) => b.percent - a.percent);
+                setPlayedStats(stats);
+            } catch (error) {
+                console.error('Fel vid hämtning av wrapped data:', error);
+                setPlayedStats([]);
+            } finally {
+                setIsLoadingWrapped(false);
+            }
+        };
+
+        fetchWrapped();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [contract, address, hasSubscription, playedTracks]);
 
     const handleSubscribe = async () => {
         if (!contract || !address) return;
@@ -120,42 +167,6 @@ const Balance = () => {
         }
     };
 
-    const handleSettlePeriod = async () => {
-        if (!contract || !address || currentPeriod === 0) return;
-
-        try {
-            setIsSettling(true);
-
-            // Settle förra perioden (current - 1)
-            const periodToSettle = currentPeriod - 1;
-            
-            console.log(`Settling period ${periodToSettle}...`);
-            const tx = await contract.settleListenerPeriod(address, periodToSettle);
-
-            console.log('Settling, transaction hash:', tx.hash);
-            await tx.wait();
-
-            alert('Period settled! Payments distributed to artists 💰');
-
-        } catch (error: any) {
-            console.error('Settlement error:', error);
-            
-            if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
-                alert('You cancelled the settlement');
-            } else if (error.message?.includes('period still active')) {
-                alert('Cannot settle current period - wait until it ends!');
-            } else if (error.message?.includes('period unpaid')) {
-                alert('You did not pay for that period');
-            } else if (error.message?.includes('already settled')) {
-                alert('This period has already been settled');
-            } else {
-                alert(`Settlement failed: ${error.message || 'Unknown error'}`);
-            }
-        } finally {
-            setIsSettling(false);
-        }
-    };
-
     const calculateNextPaymentDate = () => {
         if (epochStart === 0 || billingPeriod === 0) return 'Loading...';
         
@@ -197,13 +208,9 @@ const Balance = () => {
                             </div>
                             
                             {hasSubscription ? (
-                                <button 
-                                    onClick={handleSettlePeriod}
-                                    className="subscribe-button"
-                                    disabled={isSettling || currentPeriod === 0}
-                                >
-                                    {isSettling ? 'Settling...' : `Settle Period ${currentPeriod - 1}`}
-                                </button>
+                                <div className="settle-info">
+                                    Perioder avslutas automatiskt när perioden är slut. 🎯
+                                </div>
                             ) : (
                                 <button 
                                     onClick={handleSubscribe}
@@ -239,16 +246,29 @@ const Balance = () => {
                         {hasSubscription && playedTracks.length > 0 && (
                             <div className="distribution-box">
                                 <h3 className="distribution-title">Your Wrapped - Period {currentPeriod}</h3>
-                                <p className="distribution-description">
-                                    You've listened to {playedTracks.length} unique tracks this period!
-                                </p>
-                                <div className="played-tracks-list">
-                                    {playedTracks.map((trackId) => (
-                                        <div key={trackId} className="played-track-item">
-                                            Track ID: {trackId}
+                                {isLoadingWrapped ? (
+                                    <p className="distribution-description">Loading your stats...</p>
+                                ) : playedStats.length === 0 ? (
+                                    <p className="distribution-description">No play data yet this period.</p>
+                                ) : (
+                                    <>
+                                        <p className="distribution-description">
+                                            You've listened to {playedStats.length} tracks this period.
+                                        </p>
+                                        <div className="played-tracks-list">
+                                            {playedStats.map((stat) => (
+                                                <div key={stat.trackId} className="played-track-item">
+                                                    <div className="played-track-title">
+                                                        {stat.title} — {stat.artist}
+                                                    </div>
+                                                    <div className="played-track-meta">
+                                                        {stat.plays} plays • {stat.percent}% av dina lyssningar
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
+                                    </>
+                                )}
                             </div>
                         )}
 
