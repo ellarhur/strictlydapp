@@ -29,14 +29,12 @@ export const TracksProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       try {
         const parsed: StoredTracksPayload = JSON.parse(storedTracks);
 
-        // Äldre format (bara array) saknar contractAddress => rensa för att undvika id-mismatch efter redeploy.
         if (Array.isArray(parsed)) {
           localStorage.removeItem('strictly_tracks');
           setTracks([]);
           return;
         }
 
-        // Nytt format: validera att vi är på samma kontrakt
         const storedAddress = (parsed.contractAddress || '').toLowerCase();
         const currentAddress = (STRICTLY_CONTRACT_ADDRESS || '').toLowerCase();
 

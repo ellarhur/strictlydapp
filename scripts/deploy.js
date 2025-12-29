@@ -25,13 +25,13 @@ async function main() {
 
   const address = await strictly.getAddress();
 
-  console.log(`✅ Strictly deployed to: ${address}`);
-  console.log(`📝 Save this address for your frontend!`);
+  console.log(`Strictly deployed to: ${address}`);
+  console.log(`Save this address for your frontend.`);
   
   console.log("\nWaiting for block confirmations...");
   await strictly.deploymentTransaction()?.wait(5);
   
-  console.log("\n🔍 To verify the contract, run:");
+  console.log("\nTo verify the contract, run:");
   console.log(`npx hardhat verify --network ${hardhatNetworkName} ${address} "${monthlyFee.toString()}"`);
 }
 

@@ -1,10 +1,10 @@
 #!/bin/bash
-# Deploy script för Base Sepolia
+# Deploy script for Base Sepolia
 
-# Ladda environment variables från .env
+# Load environment variables from .env
 set -a
 source .env
 set +a
 
-# Deploya kontraktet
+# Deploy the contract
 npx hardhat run scripts/deploy.js --network baseSepolia

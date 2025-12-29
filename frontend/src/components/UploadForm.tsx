@@ -25,6 +25,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [hasConfirmedRights, setHasConfirmedRights] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +35,11 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
       return;
     }
 
-    // 2. VALIDERING - Kolla att royaltyWallet är giltig
+    if (!hasConfirmedRights) {
+      setError('Please confirm ownership/licensing before uploading.');
+      return;
+    }
+
     if (!formData.royaltyWallet.startsWith('0x') || formData.royaltyWallet.length !== 42) {
       setError('Invalid wallet address');
       return;
@@ -65,7 +70,6 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
 
       setSuccessMessage('Thank you for adding your song');
 
-      // Försök läsa trackId från TrackAdded-eventet så UI får rätt on-chain id
       let onChainTrackId: number | null = null;
       try {
         for (const log of receipt?.logs || []) {
@@ -78,14 +82,13 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
               break;
             }
           } catch {
-            // ignore logs that don't belong to Strictly ABI
+            
           }
         }
       } catch {
-        // ignore parsing errors and fallback below
+        
       }
 
-      // Fallback: om vi inte hittade eventet, använd (trackCount - 1)
       if (onChainTrackId === null) {
         const count = await contract.trackCount();
         onChainTrackId = Math.max(0, Number(count) - 1);
@@ -111,6 +114,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           imageUrl: '',
           audioUrl: ''
         });
+        setHasConfirmedRights(false);
         setSuccessMessage('');
       }, 2000); 
 
@@ -137,6 +141,10 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasConfirmedRights(e.target.checked);
   };
 
   return (
@@ -229,6 +237,22 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUpload }) => {
           placeholder="https://..."
           disabled={isUploading}
         />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="rightsConfirmation">
+          <input
+            type="checkbox"
+            id="rightsConfirmation"
+            name="rightsConfirmation"
+            checked={hasConfirmedRights}
+            onChange={handleConfirmChange}
+            disabled={isUploading}
+            required
+          />
+          {' '} <br />
+          I confirm I own or have licensed the rights to upload this track.
+        </label>
       </div>
 
       <button 

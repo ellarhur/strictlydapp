@@ -8,7 +8,7 @@ const Login = () => {
     const navigate = useNavigate();
     const { isConnected, isLoading, connectWallet } = useWallet();
 
-    // Om wallet redan är ansluten, redirecta direkt (vänta på loading)
+    // If wallet is already connected, redirect immediately (after loading)
     useEffect(() => {
         if (!isLoading && isConnected) {
             navigate('/ListenerDashboard');
@@ -17,10 +17,10 @@ const Login = () => {
 
     const handleConnectWallet = async () => {
         await connectWallet();
-        // Efter lyckad anslutning kommer useEffect att redirecta
+        // After successful connection, the useEffect above will redirect
     };
 
-    // Visa loading medan vi kollar auto-connect
+    // Show loading while we check auto-connect
     if (isLoading) {
         return (
             <>
@@ -41,29 +41,12 @@ const Login = () => {
             <div className="home-container">
                 <div className="introduction">
                     <h1>Connect Your Wallet</h1>
-                    <p>Connect your wallet to start listening and supporting artists.</p>
                     
                     <button 
                         onClick={handleConnectWallet}
                         className="getstarted-button"
                     >
                         Connect Wallet
-                    </button>
-
-                    <div className="wallet-info">
-                        <p className="wallet-info-text">
-                            We support MetaMask, Coinbase Wallet, and other Web3 wallets.
-                        </p>
-                        <p className="wallet-info-text">
-                            Make sure you're on the {NETWORK_NAME} network.
-                        </p>
-                    </div>
-
-                    <button 
-                        onClick={() => navigate('/')}
-                        className="back-button"
-                    >
-                        ← Back to Home
                     </button>
                 </div>
             </div>

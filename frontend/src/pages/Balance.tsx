@@ -25,14 +25,13 @@ const Balance = () => {
     const [isSubscribing, setIsSubscribing] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // Redirecta till login om inte ansluten (vänta på loading)
     useEffect(() => {
         if (!walletLoading && !isConnected) {
             navigate('/login');
         }
     }, [walletLoading, isConnected, navigate]);
 
-    // Hämta contract data
+    // Fetch contract data
     useEffect(() => {
         const fetchContractData = async () => {
             if (!contract || !address) {
@@ -43,7 +42,7 @@ const Balance = () => {
             try {
                 setLoading(true);
 
-                // Hämta variabler från kontraktet
+                // Fetch variables from the contract
                 const fee = await contract.monthlyFee();
                 const period = await contract.BILLING_PERIOD();
                 const epoch = await contract.epochStart();
@@ -56,15 +55,15 @@ const Balance = () => {
                 setCurrentPeriod(Number(current));
                 setHasSubscription(hasSub);
 
-                // Hämta played tracks för current period
+                // Fetch played tracks for current period
                 if (hasSub) {
                     const tracks = await contract.playedTrackIdsByPeriod(address, current);
                     setPlayedTracks(tracks.map((t: bigint) => Number(t)));
                 }
-                setPlayedStats([]); // reset så vi inte visar gammal wrapped om period ändras
+                setPlayedStats([]); // reset so we don't show stale wrapped data if period changes
 
             } catch (error) {
-                console.error('Fel vid hämtning av contract data:', error);
+                console.error('Error fetching contract data:', error);
             } finally {
                 setLoading(false);
             }
@@ -73,7 +72,7 @@ const Balance = () => {
         fetchContractData();
     }, [contract, address]);
 
-    // Hämta plays per track för "Your Wrapped"
+    // Fetch plays per track for "Your Wrapped"
     useEffect(() => {
         const fetchWrapped = async () => {
             if (!contract || !address || !hasSubscription || playedTracks.length === 0) {
@@ -84,7 +83,7 @@ const Balance = () => {
             try {
                 const current = await contract.currentPeriod();
                     const trackIds = playedTracks;
-                // Hämta total plays för perioden
+                // Fetch total plays for the current period
                 const totalPlays = await contract.totalTrackPlays(address, current);
                 const total = Number(totalPlays);
                 if (total === 0) {
@@ -100,14 +99,13 @@ const Balance = () => {
                     const trackMeta = currentTrack?.id === id ? currentTrack : tracks.find((t) => t.id === id);
                     const title = trackMeta?.title || `Track #${id}`;
                     const artist = trackMeta?.artist || 'Unknown artist';
-                    const percent = Math.round((plays / total) * 1000) / 10; // en decimal
+                    const percent = Math.round((plays / total) * 1000) / 10;
                     stats.push({ trackId: id, plays, title, artist, percent });
                 }
-                // Sortera störst först
                 stats.sort((a, b) => b.percent - a.percent);
                 setPlayedStats(stats);
             } catch (error) {
-                console.error('Fel vid hämtning av wrapped data:', error);
+                console.error('Error fetching wrapped data:', error);
                 setPlayedStats([]);
             } finally {
                 setIsLoadingWrapped(false);
@@ -115,7 +113,6 @@ const Balance = () => {
         };
 
         fetchWrapped();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contract, address, hasSubscription, playedTracks]);
 
     const handleSubscribe = async () => {
@@ -124,12 +121,11 @@ const Balance = () => {
         try {
             setIsSubscribing(true);
 
-            // Preflight: undvik revert (och "missing revert data") genom att kolla state först
             const period = await contract.currentPeriod();
             const alreadyPaid = await contract.hasPaidForPeriod(address, period);
             if (alreadyPaid) {
                 setHasSubscription(true);
-                alert(`You already have an active subscription for period ${Number(period)}! ✅`);
+                alert(`You already have an active subscription for period ${Number(period)}!`);
                 return;
             }
 
@@ -144,9 +140,8 @@ const Balance = () => {
             console.log('Subscribing, transaction hash:', tx.hash);
             await tx.wait();
 
-            alert('Subscription successful! 🎉');
+            alert('Subscription successful!');
             
-            // Uppdatera subscription status
             const hasSub = await contract.hasActiveSubscription(address);
             setHasSubscription(hasSub);
 
@@ -174,6 +169,10 @@ const Balance = () => {
         return new Date(nextPeriodStart * 1000).toLocaleDateString();
     };
 
+    const formatPeriodLabel = (periodValue: number) => {
+        return periodValue === 0 ? 'First period' : `Period ${periodValue}`;
+    };
+
     return (
         <>
             <ModeButton />
@@ -185,7 +184,7 @@ const Balance = () => {
             <div className="dashboard-layout">
                 <div className="main-content">
                     <div className="recommended-tracks">
-                        <h2>Premium Subscription</h2>
+                        <h2>Your Subscription</h2>
                         
                         <div className="subscription-box">
                             <div className="subscription-cost-section">
@@ -198,7 +197,7 @@ const Balance = () => {
                                             {monthlyFee} ETH / {billingPeriod / 86400} days
                                         </p>
                                         <p className="subscription-price-sek">
-                                            Period {currentPeriod} {hasSubscription ? '✅ Active' : '❌ Inactive'}
+                                            {formatPeriodLabel(currentPeriod)} {hasSubscription ? 'Active' : 'Inactive'}
                                         </p>
                                         <p className="subscription-price-sek">
                                             Next payment: {calculateNextPaymentDate()}
@@ -209,7 +208,7 @@ const Balance = () => {
                             
                             {hasSubscription ? (
                                 <div className="settle-info">
-                                    Perioder avslutas automatiskt när perioden är slut. 🎯
+                                    Periods settle automatically when the period ends.
                                 </div>
                             ) : (
                                 <button 
@@ -222,30 +221,11 @@ const Balance = () => {
                             )}
                         </div>
 
-                        <div className="distribution-box">
-                            <h3 className="distribution-title">How We Distribute Your Money</h3>
-                            
-                            <div className="distribution-item">
-                                <div className="distribution-label">
-                                    <span>Artists You Listen To</span>
-                                    <span className="distribution-percentage">100%</span>
-                                </div>
-                                <div className="distribution-bar-container">
-                                    <div className="distribution-bar"></div>
-                                </div>
-                            </div>
-
-                            <p className="distribution-description">
-                                100% of your subscription goes directly to the artists you listen to! 
-                                Your payment is distributed proportionally based on your listening time. 
-                                The more you listen to an artist, the more they earn from your subscription. 
-                                All payments are processed transparently on the blockchain.
-                            </p>
-                        </div>
+            
 
                         {hasSubscription && playedTracks.length > 0 && (
                             <div className="distribution-box">
-                                <h3 className="distribution-title">Your Wrapped - Period {currentPeriod}</h3>
+                                <h3 className="distribution-title">Your Wrapped - {formatPeriodLabel(currentPeriod)}</h3>
                                 {isLoadingWrapped ? (
                                     <p className="distribution-description">Loading your stats...</p>
                                 ) : playedStats.length === 0 ? (
@@ -259,11 +239,11 @@ const Balance = () => {
                                             {playedStats.map((stat) => (
                                                 <div key={stat.trackId} className="played-track-item">
                                                     <div className="played-track-title">
-                                                        {stat.title} — {stat.artist}
+                                                       <u> {stat.title} — {stat.artist}</u>
                                                     </div>
                                                     <div className="played-track-meta">
-                                                        {stat.plays} plays • {stat.percent}% av dina lyssningar
-                                                    </div>
+                                                        {stat.plays} plays • {stat.percent}% of your listening
+                                                    </div><br />
                                                 </div>
                                             ))}
                                         </div>
@@ -283,26 +263,7 @@ const Balance = () => {
                     </div>
                 </div>
                 
-                <div className="sidebar-player">
-                    <div className="streaming-window">
-                        <h2>Now Playing...</h2>
-                        {currentTrack ? (
-                            <>
-                                <img src={currentTrack.imageUrl || "/assets/track-1.jpg"} alt={currentTrack.title} />
-                                <div className="player-controls">
-                                    <button className="from-beginning">⏮</button>
-                                    <button className="pause">⏸</button>
-                                    <button className="skip">⏭</button>
-                                </div>
-                                <p className="track-name">{currentTrack.title}</p>
-                                <p className="artist-name">{currentTrack.artist}</p>
-                                <p className="genre-tag">{currentTrack.genre}</p>
-                            </>
-                        ) : (
-                            <p className="no-track-message">Pick a song to listen to!</p>
-                        )}
-                    </div>
-                </div>
+             
             </div>
         </>
     )

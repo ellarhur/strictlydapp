@@ -15,14 +15,14 @@ const ListenerDashboard = () => {
     const [isPlayingTrack, setIsPlayingTrack] = useState(false);
     const [hasSubscription, setHasSubscription] = useState(false);
 
-    // Redirecta till login om inte ansluten (vänta på loading)
+    // Redirect to login if not connected (after loading)
     useEffect(() => {
         if (!walletLoading && !isConnected) {
             navigate('/login');
         }
     }, [walletLoading, isConnected, navigate]);
 
-    // Kolla subscription status
+    // Check subscription status
     useEffect(() => {
         const checkSubscription = async () => {
             if (!contract || !address) return;
@@ -52,16 +52,16 @@ const ListenerDashboard = () => {
         try {
             setIsPlayingTrack(true);
 
-            // 1. Registrera play i contract (blockchain transaction)
+            // 1. Register play in contract (blockchain transaction)
             console.log(`Recording play for track ${trackId}...`);
             const tx = await contract.playTrack(trackId);
             console.log('Play recorded, transaction hash:', tx.hash);
             
-            // Vänta på bekräftelse (valfritt - kan också bara fortsätta)
+            // Wait for confirmation (optional — could also continue)
             await tx.wait();
-            console.log('Play confirmed on blockchain! ✅');
+            console.log('Play confirmed on blockchain');
 
-            // 2. Sätt track som current i UI
+            // 2. Set track as current in UI
             const track = tracks.find(t => t.id === trackId);
             if (track) {
                 setCurrentTrack(track);
@@ -102,7 +102,7 @@ const ListenerDashboard = () => {
                     color: 'white',
                     margin: '10px 0'
                 }}>
-                    ⚠️ No active subscription! Go to Balance to subscribe.
+                    No active subscription. Go to Balance to subscribe.
                 </div>
             )}
 
@@ -114,14 +114,14 @@ const ListenerDashboard = () => {
                     color: 'white',
                     margin: '10px 0'
                 }}>
-                    🎵 Recording play on blockchain...
+                    Recording play on blockchain...
                 </div>
             )}
             
             <div className="dashboard-layout">
                 <div className="main-content">
                     <div className="recommended-tracks">
-                        <h2>Latest uploaded tracks {hasSubscription && '✅'}</h2>
+                        <h2>Latest uploaded tracks {hasSubscription}</h2>
                         {tracks.slice().reverse().slice(0, 3).map(track => (
                             <div 
                                 key={track.id} 

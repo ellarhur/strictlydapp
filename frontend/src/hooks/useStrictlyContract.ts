@@ -7,12 +7,12 @@ import { JsonRpcSigner } from 'ethers';
 export const useStrictlyContract = (signer: JsonRpcSigner | null) => {
   const contract = useMemo(() => {
     if (!signer) {
-      console.log('⚠️ Ingen signer - användaren inte ansluten');
+      console.log('No signer — user is not connected.');
       return null;
     }
 
     if (!STRICTLY_CONTRACT_ADDRESS || !STRICTLY_CONTRACT_ADDRESS.startsWith('0x')) {
-      console.log('⚠️ Ingen giltig kontraktsadress satt (VITE_STRICTLY_CONTRACT_ADDRESS saknas).');
+      console.log('No valid contract address set (missing VITE_STRICTLY_CONTRACT_ADDRESS).');
       return null;
     }
 
@@ -22,10 +22,10 @@ export const useStrictlyContract = (signer: JsonRpcSigner | null) => {
       signer
     );
 
-    console.log('✅ Strictly contract redo på:', STRICTLY_CONTRACT_ADDRESS);
+    console.log('Strictly contract ready at:', STRICTLY_CONTRACT_ADDRESS);
     
     return newContract;
-  }, [signer]); // Skapa bara nytt contract när signer ändras!
+  }, [signer]);
 
   return contract;
 };

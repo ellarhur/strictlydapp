@@ -6,7 +6,6 @@ const Navbar = () => {
 
     const handleDisconnect = () => {
         disconnectWallet();
-        // Redirect till home efter disconnect
         window.location.href = '/';
     };
 

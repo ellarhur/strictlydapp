@@ -33,22 +33,20 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         params: [{ chainId: desiredHex }]
       });
     } catch (err: any) {
-      // 4902 = okänt nätverk i wallet
       if (err?.code === 4902) {
-        alert(`Nätverket "${NETWORK_NAME}" finns inte i din wallet. Lägg till det manuellt och försök igen.`);
+        alert(`Network "${NETWORK_NAME}" is not added in your wallet. Please add it manually and retry.`);
         return;
       }
-      // 4001 = användaren nekade
       if (err?.code === 4001) {
-        alert(`Byt till "${NETWORK_NAME}" i din wallet för att använda appen.`);
+        alert(`Switch to "${NETWORK_NAME}" in your wallet to use the app.`);
         return;
       }
-      console.log('Kunde inte byta nätverk automatiskt (ignoreras):', err);
+      // Non-blocking: if auto-switch fails, user can still switch manually.
+      console.log('Could not switch network automatically (ignored):', err);
     }
   }, []);
 
   const disconnectWallet = useCallback(() => {
-    // Försök revoke permissions från wallet
     if (window.ethereum?.request) {
       window.ethereum.request({
         method: 'wallet_revokePermissions',
@@ -61,29 +59,26 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setSigner(null);
     setIsConnected(false);
     
-    // Ta bort från localStorage
     localStorage.removeItem(STORAGE_KEY);
     
-    console.log('🔌 Wallet frånkopplad');
+    console.log('Wallet disconnected');
   }, []);
 
   const connectWallet = useCallback(async () => {
     try {
       if (!window.ethereum) {
-        alert('Ingen Web3 wallet hittades! Installera MetaMask eller Coinbase Wallet.');
+        alert('No Web3 wallet found. Please install MetaMask or Coinbase Wallet.');
         return;
       }
 
-      // Enkel anslutning - visar wallet popup automatiskt
       const accounts = await window.ethereum.request({ 
         method: 'eth_requestAccounts' 
       });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error('Ingen account vald');
+        throw new Error('No account selected');
       }
 
-      // Försök att byta till rätt chain innan vi skapar provider/signer
       await ensureCorrectNetwork();
 
       const browserProvider = new BrowserProvider(window.ethereum);
@@ -95,34 +90,30 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       setAddress(userAddress);
       setIsConnected(true);
 
-      // Spara till localStorage att användaren har connectat
       localStorage.setItem(STORAGE_KEY, 'true');
 
-      console.log('✅ Wallet ansluten:', userAddress);
+      console.log('Wallet connected:', userAddress);
     } catch (error: any) {
-      console.error('❌ Fel vid anslutning till wallet:', error);
+      console.error('Failed to connect wallet:', error);
       
       if (error.code === 4001) {
-        alert('Du nekade anslutning till wallet');
+        alert('You denied the wallet connection request.');
       } else {
-        alert('Kunde inte ansluta till wallet');
+        alert('Could not connect to wallet.');
       }
     }
   }, [ensureCorrectNetwork]);
 
-  // Auto-connect vid mount om användaren var tidigare connectad
   useEffect(() => {
     const autoConnect = async () => {
       setIsLoading(true);
 
-      // Kolla om användaren var tidigare connectad
       const wasConnected = localStorage.getItem(STORAGE_KEY);
       
       if (wasConnected === 'true' && window.ethereum) {
         try {
-          // Försök hämta accounts utan popup (om permission redan givits)
           const accounts = await window.ethereum.request({ 
-            method: 'eth_accounts' // Använd eth_accounts istället för eth_requestAccounts
+            method: 'eth_accounts' // Use eth_accounts for silent check instead of eth_requestAccounts
           });
 
           if (accounts && accounts.length > 0) {
@@ -136,13 +127,13 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             setAddress(userAddress);
             setIsConnected(true);
 
-            console.log('✅ Auto-connectad till wallet:', userAddress);
+            console.log('Auto-connected to wallet:', userAddress);
           } else {
-            // Ingen account tillgänglig, rensa localStorage
+            // No account available; clear auto-connect flag
             localStorage.removeItem(STORAGE_KEY);
           }
         } catch (error) {
-          console.error('Auto-connect misslyckades:', error);
+          console.error('Auto-connect failed:', error);
           localStorage.removeItem(STORAGE_KEY);
         }
       }
@@ -153,29 +144,29 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     autoConnect();
   }, [ensureCorrectNetwork]);
 
-  // Event listeners för account/chain ändringar
+  // Event listeners for account/chain changes
   useEffect(() => {
     if (!window.ethereum) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
-      console.log('🔄 accountsChanged event:', accounts);
+      console.log('accountsChanged event:', accounts);
       
       if (accounts.length === 0) {
-        // Användaren har disconnectat i MetaMask
-        console.log('❌ Inga accounts, disconnectar...');
+        // User disconnected in wallet
+        console.log('No accounts, disconnecting...');
         disconnectWallet();
       } else if (accounts[0].toLowerCase() !== address?.toLowerCase()) {
-        // Endast re-connecta om adressen faktiskt ändrats
-        console.log('🔄 Ny adress detekterad, re-connectar...');
+        // Only reconnect if address actually changed
+        console.log('New address detected, reconnecting...');
         connectWallet();
       } else {
-        // Samma adress, ignorera (händer ofta efter transactions)
-        console.log('✅ Samma adress, ignorerar event');
+        // Same address; ignore (common after transactions)
+        console.log('Same address, ignoring event');
       }
     };
 
     const handleChainChanged = () => {
-      console.log('⛓️ Chain ändrades, reloading...');
+      console.log('Chain changed, reloading...');
       window.location.reload();
     };
 
@@ -210,7 +201,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 export const useWallet = () => {
   const context = useContext(WalletContext);
   if (context === undefined) {
-    throw new Error('useWallet måste användas inom en WalletProvider');
+    throw new Error('useWallet must be used within a WalletProvider');
   }
   return context;
 };

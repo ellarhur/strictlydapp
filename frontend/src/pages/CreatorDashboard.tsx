@@ -17,14 +17,14 @@ const CreatorDashboard = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [totalTrackCount, setTotalTrackCount] = useState<number>(0);
 
-  // Redirecta till login om inte ansluten (vänta på loading)
+  // Redirect to login if not connected (after loading)
   useEffect(() => {
     if (!walletLoading && !isConnected) {
       navigate('/login');
     }
   }, [walletLoading, isConnected, navigate]);
 
-  // Hämta total track count från contract
+  // Fetch total track count from the contract
   useEffect(() => {
     const fetchTrackCount = async () => {
       if (!contract) return;
@@ -59,9 +59,6 @@ const CreatorDashboard = () => {
       <div className="dashboard-layout">
         <div className="main-content">
           <div className="wallet-info-box" style={{ marginBottom: '20px' }}>
-            <p className="wallet-info-label">
-              Total Tracks on Platform: {totalTrackCount}
-            </p>
           </div>
 
           <div className="recommended-tracks">
