@@ -12,7 +12,6 @@ const ListenerDashboard = () => {
     const { tracks, currentTrack, setCurrentTrack } = useTracks();
     const { isConnected, isLoading: walletLoading, signer, address } = useWallet();
     const contract = useStrictlyContract(signer);
-    const [isPlayingTrack, setIsPlayingTrack] = useState(false);
     const [hasSubscription, setHasSubscription] = useState(false);
 
     // Redirect to login if not connected (after loading)
@@ -50,8 +49,6 @@ const ListenerDashboard = () => {
         }
 
         try {
-            setIsPlayingTrack(true);
-
             // 1. Register play in contract (blockchain transaction)
             console.log(`Recording play for track ${trackId}...`);
             const tx = await contract.playTrack(trackId);
@@ -81,8 +78,6 @@ const ListenerDashboard = () => {
             } else {
                 alert(`Error playing track: ${error.message || 'Unknown error'}`);
             }
-        } finally {
-            setIsPlayingTrack(false);
         }
     };
 
@@ -93,30 +88,6 @@ const ListenerDashboard = () => {
             <ModeButton />
             
             <h1 className="dashboard-title">Listen to your favourite tracks</h1>
-            
-            {!hasSubscription && (
-                <div style={{ 
-                    textAlign: 'center', 
-                    padding: '10px', 
-                    background: '#ff6b6b', 
-                    color: 'white',
-                    margin: '10px 0'
-                }}>
-                    No active subscription. Go to Balance to subscribe.
-                </div>
-            )}
-
-            {isPlayingTrack && (
-                <div style={{ 
-                    textAlign: 'center', 
-                    padding: '10px', 
-                    background: '#51cf66', 
-                    color: 'white',
-                    margin: '10px 0'
-                }}>
-                    Recording play on blockchain...
-                </div>
-            )}
             
             <div className="dashboard-layout">
                 <div className="main-content">
