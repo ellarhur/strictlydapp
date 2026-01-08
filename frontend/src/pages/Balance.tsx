@@ -16,7 +16,6 @@ const Balance = () => {
 
     const [monthlyFee, setMonthlyFee] = useState<string>('0');
     const [billingPeriod, setBillingPeriod] = useState<number>(0);
-    const [epochStart, setEpochStart] = useState<number>(0);
     const [currentPeriod, setCurrentPeriod] = useState<number>(0);
     const [hasSubscription, setHasSubscription] = useState<boolean>(false);
     const [playedTracks, setPlayedTracks] = useState<number[]>([]);
@@ -45,13 +44,11 @@ const Balance = () => {
                 // Fetch variables from the contract
                 const fee = await contract.monthlyFee();
                 const period = await contract.BILLING_PERIOD();
-                const epoch = await contract.epochStart();
                 const current = await contract.currentPeriod();
                 const hasSub = await contract.hasActiveSubscription(address);
 
                 setMonthlyFee(ethers.formatEther(fee));
                 setBillingPeriod(Number(period));
-                setEpochStart(Number(epoch));
                 setCurrentPeriod(Number(current));
                 setHasSubscription(hasSub);
 
@@ -162,13 +159,6 @@ const Balance = () => {
         }
     };
 
-    const calculateNextPaymentDate = () => {
-        if (epochStart === 0 || billingPeriod === 0) return 'Loading...';
-        
-        const nextPeriodStart = epochStart + ((currentPeriod + 1) * billingPeriod);
-        return new Date(nextPeriodStart * 1000).toLocaleDateString();
-    };
-
     const formatPeriodLabel = (periodValue: number) => {
         return periodValue === 0 ? 'First period' : `Period ${periodValue}`;
     };
@@ -198,9 +188,6 @@ const Balance = () => {
                                         </p>
                                         <p className="subscription-price-sek">
                                             {formatPeriodLabel(currentPeriod)} {hasSubscription ? 'Active' : 'Inactive'}
-                                        </p>
-                                        <p className="subscription-price-sek">
-                                            Next payment: {calculateNextPaymentDate()}
                                         </p>
                                     </>
                                 )}
